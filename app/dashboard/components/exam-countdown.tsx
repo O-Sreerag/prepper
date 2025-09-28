@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Icons } from "@/components/icons"
+import { EXAM_COUNTDOWN_STRINGS as STRINGS } from "@/constants"
 
 export function ExamCountdown() {
   const examDate = new Date("2024-06-15")
@@ -20,18 +21,18 @@ export function ExamCountdown() {
               <Icons.calendar className="h-5 w-5 text-primary" />
               JEE Main 2024
             </CardTitle>
-            <CardDescription>Your target exam is approaching</CardDescription>
+            <CardDescription>{STRINGS.description}</CardDescription>
           </div>
           <div className="text-right">
             <div className="text-3xl font-bold text-primary">{daysLeft}</div>
-            <div className="text-sm text-muted-foreground">days left</div>
+            <div className="text-sm text-muted-foreground">{STRINGS.daysLeft}</div>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span>Preparation Progress</span>
+            <span>{STRINGS.preparationProgress}</span>
             <span>{Math.round(progress)}%</span>
           </div>
           <Progress value={progress} className="h-2" />

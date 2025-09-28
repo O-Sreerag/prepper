@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Icons } from "@/components/icons"
+import { UPLOAD_TEST_DIALOG_STRINGS as STRINGS } from "@/constants"
 
 interface UploadTestDialogProps {
   open: boolean
@@ -36,8 +37,8 @@ export function UploadTestDialog({ open, onOpenChange }: UploadTestDialogProps) 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Upload New Test</DialogTitle>
-          <DialogDescription>Upload question papers and answer sheets to create a new mock test</DialogDescription>
+          <DialogTitle>{STRINGS.title}</DialogTitle>
+          <DialogDescription>{STRINGS.description}</DialogDescription>
         </DialogHeader>
 
         {uploadStep === 1 && (
@@ -45,25 +46,23 @@ export function UploadTestDialog({ open, onOpenChange }: UploadTestDialogProps) 
             {/* File Upload Section */}
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Question Paper</Label>
+                <Label>{STRINGS.questionPaper}</Label>
                 <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
                   <Icons.upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                  <div className="text-sm text-muted-foreground mb-2">
-                    Drop your question paper here, or click to browse
-                  </div>
+                  <div className="text-sm text-muted-foreground mb-2">{STRINGS.dropQuestionPaper}</div>
                   <Button variant="outline" size="sm">
-                    Choose File
+                    {STRINGS.chooseFile}
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Answer Sheet (Optional)</Label>
+                <Label>{STRINGS.answerSheet}</Label>
                 <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
                   <Icons.fileText className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                  <div className="text-sm text-muted-foreground mb-2">Upload answer key for automatic evaluation</div>
+                  <div className="text-sm text-muted-foreground mb-2">{STRINGS.uploadAnswerKey}</div>
                   <Button variant="outline" size="sm">
-                    Choose File
+                    {STRINGS.chooseFile}
                   </Button>
                 </div>
               </div>
@@ -72,54 +71,57 @@ export function UploadTestDialog({ open, onOpenChange }: UploadTestDialogProps) 
             {/* Test Details */}
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="test-title">Test Title</Label>
-                <Input id="test-title" placeholder="e.g., Physics Mock Test #13" />
+                <Label htmlFor="test-title">{STRINGS.testTitle}</Label>
+                <Input id="test-title" placeholder={STRINGS.testTitlePlaceholder} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
+                <Label htmlFor="subject">{STRINGS.subject}</Label>
                 <Select>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select subject" />
+                    <SelectValue placeholder={STRINGS.selectSubject} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="physics">Physics</SelectItem>
-                    <SelectItem value="chemistry">Chemistry</SelectItem>
-                    <SelectItem value="mathematics">Mathematics</SelectItem>
-                    <SelectItem value="biology">Biology</SelectItem>
+                    {Object.entries(STRINGS.subjects).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="duration">Duration (minutes)</Label>
-                <Input id="duration" type="number" placeholder="180" />
+                <Label htmlFor="duration">{STRINGS.duration}</Label>
+                <Input id="duration" type="number" placeholder={STRINGS.durationPlaceholder} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="difficulty">Difficulty</Label>
+                <Label htmlFor="difficulty">{STRINGS.difficulty}</Label>
                 <Select>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select difficulty" />
+                    <SelectValue placeholder={STRINGS.selectDifficulty} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="easy">Easy</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="hard">Hard</SelectItem>
+                    {Object.entries(STRINGS.difficulties).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description (Optional)</Label>
-              <Textarea id="description" placeholder="Add any additional notes about this test..." />
+              <Label htmlFor="description">{STRINGS.descriptionLabel}</Label>
+              <Textarea id="description" placeholder={STRINGS.descriptionPlaceholder} />
             </div>
 
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+                {STRINGS.cancel}
               </Button>
               <Button onClick={handleUpload} disabled={isUploading}>
                 {isUploading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-                Upload & Process
+                {STRINGS.uploadAndProcess}
               </Button>
             </div>
           </div>
@@ -131,24 +133,21 @@ export function UploadTestDialog({ open, onOpenChange }: UploadTestDialogProps) 
               <Icons.checkCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-2">Test Processed Successfully!</h3>
-              <p className="text-muted-foreground mb-4">
-                AI has extracted and verified the questions from your upload.
-              </p>
+              <h3 className="text-lg font-semibold mb-2">{STRINGS.processedSuccessfully}</h3>
+              <p className="text-muted-foreground mb-4">{STRINGS.processedDescription}</p>
             </div>
 
             <div className="bg-muted rounded-lg p-4 text-left">
-              <h4 className="font-medium mb-2">Processing Results:</h4>
+              <h4 className="font-medium mb-2">{STRINGS.processingResults}</h4>
               <ul className="space-y-1 text-sm text-muted-foreground">
-                <li>• Found 60 questions</li>
-                <li>• 45 Multiple Choice Questions</li>
-                <li>• 15 Numerical Answer Type</li>
-                <li>• Answer key matched successfully</li>
+                {STRINGS.processingResultsList.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
               </ul>
             </div>
 
             <Button onClick={handleConfirm} className="w-full">
-              Add to Test Library
+              {STRINGS.addToLibrary}
             </Button>
           </div>
         )}

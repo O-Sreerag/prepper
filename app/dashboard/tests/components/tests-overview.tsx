@@ -4,49 +4,28 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
-import { UploadTestDialog } from "@/components/upload-test-dialog"
-import { TestCard } from "@/components/test-card"
+import { UploadTestDialog } from "./upload-test-dialog"
+import { TestCard } from "./test-card"
+import { TESTS_OVERVIEW_STRINGS as STRINGS } from "@/constants"
 
-const mockTests = [
-  {
-    id: 1,
-    title: "Physics Mock Test #12",
-    subject: "Physics",
-    questions: 60,
-    duration: 180,
-    difficulty: "Medium",
-    lastAttempt: "2 days ago",
-    bestScore: 78,
-    attempts: 3,
-    status: "completed",
-  },
-  {
-    id: 2,
-    title: "Mathematics Practice Set #8",
-    subject: "Mathematics",
-    questions: 45,
-    duration: 120,
-    difficulty: "Hard",
-    lastAttempt: "1 week ago",
-    bestScore: 85,
-    attempts: 2,
-    status: "completed",
-  },
-  {
-    id: 3,
-    title: "Chemistry Organic Compounds",
-    subject: "Chemistry",
-    questions: 50,
-    duration: 150,
-    difficulty: "Easy",
-    lastAttempt: null,
-    bestScore: null,
-    attempts: 0,
-    status: "new",
-  },
-]
+interface Test {
+  id: number
+  title: string
+  subject: string
+  questions: number
+  duration: number
+  difficulty: string
+  lastAttempt: string | null
+  bestScore: number | null
+  attempts: number
+  status: string
+}
 
-export function TestsOverview() {
+interface TestsOverviewProps {
+  tests: Test[]
+}
+
+export function TestsOverview({ tests }: TestsOverviewProps) {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
 
   return (
@@ -54,12 +33,12 @@ export function TestsOverview() {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Mock Tests</h2>
-          <p className="text-muted-foreground">Practice with real exam-like conditions</p>
+          <h2 className="text-2xl font-bold text-foreground">{STRINGS.title}</h2>
+          <p className="text-muted-foreground">{STRINGS.description}</p>
         </div>
         <Button onClick={() => setUploadDialogOpen(true)}>
           <Icons.upload className="mr-2 h-4 w-4" />
-          Upload New Test
+          {STRINGS.uploadNewTest}
         </Button>
       </div>
 
@@ -67,43 +46,43 @@ export function TestsOverview() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tests</CardTitle>
+            <CardTitle className="text-sm font-medium">{STRINGS.totalTests}</CardTitle>
             <Icons.fileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockTests.length}</div>
-            <p className="text-xs text-muted-foreground">Available in library</p>
+            <div className="text-2xl font-bold">{tests.length}</div>
+            <p className="text-xs text-muted-foreground">{STRINGS.availableInLibrary}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed</CardTitle>
+            <CardTitle className="text-sm font-medium">{STRINGS.completed}</CardTitle>
             <Icons.checkCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockTests.filter((t) => t.status === "completed").length}</div>
-            <p className="text-xs text-muted-foreground">Tests attempted</p>
+            <div className="text-2xl font-bold">{tests.filter((t) => t.status === "completed").length}</div>
+            <p className="text-xs text-muted-foreground">{STRINGS.testsAttempted}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Score</CardTitle>
+            <CardTitle className="text-sm font-medium">{STRINGS.averageScore}</CardTitle>
             <Icons.target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">81.5%</div>
-            <p className="text-xs text-muted-foreground">Across all attempts</p>
+            <p className="text-xs text-muted-foreground">{STRINGS.acrossAllAttempts}</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Test Library */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Test Library</h3>
+        <h3 className="text-lg font-semibold">{STRINGS.testLibrary}</h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {mockTests.map((test) => (
+          {tests.map((test) => (
             <TestCard key={test.id} test={test} />
           ))}
         </div>

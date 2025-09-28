@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Icons } from "@/components/icons"
+import { FLASHCARD_DECK_STRINGS as STRINGS } from "@/constants"
 
 interface FlashcardDeckProps {
   deck: {
@@ -52,7 +53,7 @@ export function FlashcardDeck({ deck, onStudy }: FlashcardDeckProps) {
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-1">
             <Icons.brain className="h-4 w-4 text-muted-foreground" />
-            {deck.cardCount} cards
+            {deck.cardCount} {STRINGS.cards}
           </div>
           <Badge className={getDifficultyColor(deck.difficulty)} variant="secondary">
             {deck.difficulty}
@@ -61,7 +62,7 @@ export function FlashcardDeck({ deck, onStudy }: FlashcardDeckProps) {
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span>Mastery Progress</span>
+            <span>{STRINGS.masteryProgress}</span>
             <span>{Math.round(masteryPercentage)}%</span>
           </div>
           <Progress value={masteryPercentage} className="h-2" />
@@ -70,15 +71,17 @@ export function FlashcardDeck({ deck, onStudy }: FlashcardDeckProps) {
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Icons.clock className="h-4 w-4" />
-            Due: {deck.dueCount}
+            {STRINGS.due} {deck.dueCount}
           </div>
-          <div>Last: {deck.lastStudied}</div>
+          <div>
+            {STRINGS.last} {deck.lastStudied}
+          </div>
         </div>
 
         <div className="flex gap-2">
           <Button size="sm" onClick={onStudy} className="flex-1" disabled={deck.dueCount === 0}>
             <Icons.play className="mr-2 h-4 w-4" />
-            Study ({deck.dueCount})
+            {STRINGS.study} ({deck.dueCount})
           </Button>
           <Button size="sm" variant="outline" className="bg-transparent">
             <Icons.fileText className="h-4 w-4" />

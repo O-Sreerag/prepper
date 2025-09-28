@@ -6,8 +6,9 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { DashboardSidebar } from "@/components/dashboard-sidebar"
+import { DashboardSidebar } from "./dashboard-sidebar"
 import { Icons } from "@/components/icons"
+import { DASHBOARD_LAYOUT_STRINGS as STRINGS } from "@/constants"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -32,7 +33,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             className="lg:hidden fixed top-4 left-4 z-40 bg-background/80 backdrop-blur-sm border-border/50"
           >
             <Icons.menu className="h-4 w-4" />
-            <span className="sr-only">Toggle sidebar</span>
+            <span className="sr-only">{STRINGS.toggleSidebar}</span>
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="p-0 w-64">
@@ -47,13 +48,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex h-14 sm:h-16 items-center justify-between px-4 sm:px-6 lg:px-6">
             <div className="flex items-center gap-4">
               <div className="lg:hidden w-12" /> {/* Spacer for mobile menu button */}
-              <h1 className="text-base sm:text-lg font-semibold text-foreground truncate">Dashboard</h1>
+              <h1 className="text-base sm:text-lg font-semibold text-foreground truncate">{STRINGS.dashboard}</h1>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
               <ThemeToggle />
               <Button variant="outline" size="sm" className="hidden sm:flex bg-transparent">
                 <Icons.user className="mr-2 h-4 w-4" />
-                Profile
+                {STRINGS.profile}
               </Button>
               <Button variant="outline" size="icon" className="sm:hidden bg-transparent">
                 <Icons.user className="h-4 w-4" />

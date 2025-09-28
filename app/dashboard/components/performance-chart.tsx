@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Icons } from "@/components/icons"
+import { PERFORMANCE_CHART_STRINGS as STRINGS, TEST_CARD_STRINGS } from "@/constants"
 
 export function PerformanceChart() {
   // Mock data for the chart
@@ -18,9 +19,9 @@ export function PerformanceChart() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Icons.trendingUp className="h-5 w-5 text-green-500" />
-          Performance Trends
+          {STRINGS.title}
         </CardTitle>
-        <CardDescription>Your accuracy and question-solving progress over time</CardDescription>
+        <CardDescription>{STRINGS.description}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -31,7 +32,7 @@ export function PerformanceChart() {
                 <div className="flex justify-between text-sm">
                   <span>{item.week}</span>
                   <span className="text-muted-foreground">
-                    {item.accuracy}% • {item.questions} questions
+                    {item.accuracy}% • {item.questions} {TEST_CARD_STRINGS.questions}
                   </span>
                 </div>
                 <div className="flex gap-2">
@@ -55,11 +56,11 @@ export function PerformanceChart() {
           <div className="flex gap-4 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-primary rounded-full" />
-              <span>Accuracy</span>
+              <span>{STRINGS.accuracy}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-chart-2 rounded-full" />
-              <span>Questions Solved</span>
+              <span>{STRINGS.questionsSolved}</span>
             </div>
           </div>
         </div>

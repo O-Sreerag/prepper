@@ -7,20 +7,22 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Icons } from "@/components/icons"
 
-const mockQuestion = {
-  id: 1,
-  question:
-    "A particle moves in a straight line with constant acceleration. If it covers 20m in the first 2 seconds and 60m in the next 4 seconds, find the initial velocity and acceleration.",
-  options: ["u = 5 m/s, a = 5 m/s²", "u = 2 m/s, a = 8 m/s²", "u = 0 m/s, a = 10 m/s²", "u = 3 m/s, a = 7 m/s²"],
-  correctAnswer: 0,
-  explanation:
-    "Using kinematic equations: s = ut + ½at². For first 2s: 20 = u(2) + ½a(4). For next 4s: 60 = u(4) + ½a(16) - [u(2) + ½a(4)]. Solving these equations gives u = 5 m/s and a = 5 m/s².",
-  subject: "Physics",
-  topic: "Kinematics",
-  difficulty: "Medium",
+interface Question {
+  id: number
+  question: string
+  options: string[]
+  correctAnswer: number
+  explanation: string
+  subject: string
+  topic: string
+  difficulty: string
 }
 
-export function StudyMode() {
+interface StudyModeProps {
+  question: Question
+}
+
+export function StudyMode({ question }: StudyModeProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [showExplanation, setShowExplanation] = useState(false)
   const [notes, setNotes] = useState("")
@@ -58,36 +60,36 @@ export function StudyMode() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary">{mockQuestion.subject}</Badge>
-                  <Badge variant="outline">{mockQuestion.topic}</Badge>
+                  <Badge variant="secondary">{question.subject}</Badge>
+                  <Badge variant="outline">{question.topic}</Badge>
                   <Badge
                     className={
-                      mockQuestion.difficulty === "Easy"
+                      question.difficulty === "Easy"
                         ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                        : mockQuestion.difficulty === "Medium"
+                        : question.difficulty === "Medium"
                           ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
                           : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                     }
                     variant="secondary"
                   >
-                    {mockQuestion.difficulty}
+                    {question.difficulty}
                   </Badge>
                 </div>
                 <div className="text-sm text-muted-foreground">Question 1 of 60</div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-base leading-relaxed">{mockQuestion.question}</div>
+              <div className="text-base leading-relaxed">{question.question}</div>
 
               <div className="space-y-2">
-                {mockQuestion.options.map((option, index) => (
+                {question.options.map((option, index) => (
                   <Button
                     key={index}
                     variant={selectedAnswer === index ? "default" : "outline"}
                     className={`w-full justify-start text-left h-auto p-4 ${
-                      showExplanation && index === mockQuestion.correctAnswer
+                      showExplanation && index === question.correctAnswer
                         ? "border-green-500 bg-green-50 dark:bg-green-950"
-                        : showExplanation && selectedAnswer === index && index !== mockQuestion.correctAnswer
+                        : showExplanation && selectedAnswer === index && index !== question.correctAnswer
                           ? "border-red-500 bg-red-50 dark:bg-red-950"
                           : ""
                     }`}
@@ -95,10 +97,10 @@ export function StudyMode() {
                   >
                     <span className="mr-3 font-medium">{String.fromCharCode(65 + index)}.</span>
                     {option}
-                    {showExplanation && index === mockQuestion.correctAnswer && (
+                    {showExplanation && index === question.correctAnswer && (
                       <Icons.checkCircle className="ml-auto h-4 w-4 text-green-600" />
                     )}
-                    {showExplanation && selectedAnswer === index && index !== mockQuestion.correctAnswer && (
+                    {showExplanation && selectedAnswer === index && index !== question.correctAnswer && (
                       <Icons.xCircle className="ml-auto h-4 w-4 text-red-600" />
                     )}
                   </Button>
@@ -114,7 +116,7 @@ export function StudyMode() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm leading-relaxed">{mockQuestion.explanation}</p>
+                    <p className="text-sm leading-relaxed">{question.explanation}</p>
                   </CardContent>
                 </Card>
               )}

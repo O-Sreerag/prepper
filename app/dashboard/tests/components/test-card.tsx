@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Icons } from "@/components/icons"
+import { TEST_CARD_STRINGS as STRINGS } from "@/constants"
 
 interface TestCardProps {
   test: {
@@ -62,11 +63,11 @@ export function TestCard({ test }: TestCardProps) {
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Icons.fileText className="h-4 w-4" />
-            {test.questions} questions
+            {test.questions} {STRINGS.questions}
           </div>
           <div className="flex items-center gap-1">
             <Icons.clock className="h-4 w-4" />
-            {test.duration} min
+            {test.duration} {STRINGS.min}
           </div>
         </div>
 
@@ -74,23 +75,27 @@ export function TestCard({ test }: TestCardProps) {
           <Badge className={getDifficultyColor(test.difficulty)} variant="secondary">
             {test.difficulty}
           </Badge>
-          {test.bestScore && <div className="text-sm font-medium">Best: {test.bestScore}%</div>}
+          {test.bestScore && (
+            <div className="text-sm font-medium">
+              {STRINGS.best} {test.bestScore}%
+            </div>
+          )}
         </div>
 
         {test.lastAttempt && (
           <div className="text-xs text-muted-foreground">
-            Last attempt: {test.lastAttempt} • {test.attempts} attempts
+            {STRINGS.lastAttempt} {test.lastAttempt} • {test.attempts} {STRINGS.attempts}
           </div>
         )}
 
         <div className="flex gap-2">
           <Button size="sm" className="flex-1">
             <Icons.play className="mr-2 h-4 w-4" />
-            Start Test
+            {STRINGS.startTest}
           </Button>
           <Button size="sm" variant="outline" className="flex-1 bg-transparent">
             <Icons.bookOpen className="mr-2 h-4 w-4" />
-            Study Mode
+            {STRINGS.studyMode}
           </Button>
         </div>
       </CardContent>

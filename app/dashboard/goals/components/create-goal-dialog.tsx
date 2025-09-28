@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Icons } from "@/components/icons"
+import { CREATE_GOAL_DIALOG_STRINGS as STRINGS } from "@/constants"
 
 interface CreateGoalDialogProps {
   open: boolean
@@ -20,11 +21,11 @@ export function CreateGoalDialog({ open, onOpenChange }: CreateGoalDialogProps) 
   const getGoalSuggestions = (type: string) => {
     switch (type) {
       case "daily":
-        return ["Solve 20 questions", "Study for 2 hours", "Review 10 flashcards"]
+        return STRINGS.suggestions.daily
       case "weekly":
-        return ["Complete 2 mock tests", "Solve 100 questions", "Study 15 hours"]
+        return STRINGS.suggestions.weekly
       case "monthly":
-        return ["Complete 8 mock tests", "Master a subject", "Solve 500 questions"]
+        return STRINGS.suggestions.monthly
       default:
         return []
     }
@@ -34,47 +35,50 @@ export function CreateGoalDialog({ open, onOpenChange }: CreateGoalDialogProps) 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Create New Goal</DialogTitle>
-          <DialogDescription>Set a target to track your progress and stay motivated</DialogDescription>
+          <DialogTitle>{STRINGS.title}</DialogTitle>
+          <DialogDescription>{STRINGS.description}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="goal-title">Goal Title</Label>
-            <Input id="goal-title" placeholder="e.g., Solve 150 Physics Questions" />
+            <Label htmlFor="goal-title">{STRINGS.goalTitle}</Label>
+            <Input id="goal-title" placeholder={STRINGS.goalTitlePlaceholder} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="goal-description">Description</Label>
-            <Textarea id="goal-description" placeholder="Add more details about your goal..." />
+            <Label htmlFor="goal-description">{STRINGS.descriptionLabel}</Label>
+            <Textarea id="goal-description" placeholder={STRINGS.descriptionPlaceholder} />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="goal-type">Goal Type</Label>
+              <Label htmlFor="goal-type">{STRINGS.goalType}</Label>
               <Select value={goalType} onValueChange={setGoalType}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
+                  <SelectValue placeholder={STRINGS.selectType} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                  <SelectItem value="custom">Custom</SelectItem>
+                  {Object.entries(STRINGS.goalTypes).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="priority">Priority</Label>
+              <Label htmlFor="priority">{STRINGS.priority}</Label>
               <Select>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select priority" />
+                  <SelectValue placeholder={STRINGS.selectPriority} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
+                  {Object.entries(STRINGS.priorities).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -82,35 +86,35 @@ export function CreateGoalDialog({ open, onOpenChange }: CreateGoalDialogProps) 
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="target">Target Value</Label>
-              <Input id="target" type="number" placeholder="e.g., 150" />
+              <Label htmlFor="target">{STRINGS.targetValue}</Label>
+              <Input id="target" type="number" placeholder={STRINGS.targetValuePlaceholder} />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="subject">Subject</Label>
+              <Label htmlFor="subject">{STRINGS.subject}</Label>
               <Select>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select subject" />
+                  <SelectValue placeholder={STRINGS.selectSubject} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="general">General</SelectItem>
-                  <SelectItem value="physics">Physics</SelectItem>
-                  <SelectItem value="chemistry">Chemistry</SelectItem>
-                  <SelectItem value="mathematics">Mathematics</SelectItem>
-                  <SelectItem value="biology">Biology</SelectItem>
+                  {Object.entries(STRINGS.subjects).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="deadline">Deadline</Label>
+            <Label htmlFor="deadline">{STRINGS.deadline}</Label>
             <Input id="deadline" type="date" />
           </div>
 
           {goalType && (
             <div className="space-y-2">
-              <Label>Quick Suggestions</Label>
+              <Label>{STRINGS.quickSuggestions}</Label>
               <div className="flex flex-wrap gap-2">
                 {getGoalSuggestions(goalType).map((suggestion, index) => (
                   <Button
@@ -132,11 +136,11 @@ export function CreateGoalDialog({ open, onOpenChange }: CreateGoalDialogProps) 
 
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {STRINGS.cancel}
             </Button>
             <Button>
               <Icons.target className="mr-2 h-4 w-4" />
-              Create Goal
+              {STRINGS.createGoal}
             </Button>
           </div>
         </div>
