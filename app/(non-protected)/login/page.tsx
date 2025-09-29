@@ -1,4 +1,4 @@
-import { AuthForm } from "@/components/auth-form"
+import { AuthForm } from "@/app/(non-protected)/_components/auth-form"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function LoginPage() {
