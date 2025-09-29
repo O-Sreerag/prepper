@@ -36,13 +36,13 @@ export const getFirstAccessibleRoute = (
   permissions: Permission[] | undefined
 ): string => {
   if (!permissions) {
-    return "/dashboard";
+    return "/";
   }
   const firstPermission = permissions.find((p) => p.actions.includes("VIEW") && p.link);
   if (firstPermission && firstPermission.link) {
     return firstPermission.link.trim().replace(/[\r\n]/g, '');
   }
-  return "/dashboard";
+  return "/";
 };
 
 export const updateSession = async (request: NextRequest) => {
@@ -112,11 +112,11 @@ export const updateSession = async (request: NextRequest) => {
         // const decoded = jwtDecode(accessToken) as MyTokenClaims;
         // const redirectRoute = getFirstAccessibleRoute(decoded.permissions);
         
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+        return NextResponse.redirect(new URL("/", request.url));
       } catch (jwtError) {
         console.error("Error decoding JWT or processing permissions:", jwtError);
         // Fallback to dashboard if there's an error
-        return NextResponse.redirect(new URL("/dashboard", request.url));
+        return NextResponse.redirect(new URL("/", request.url));
       }
     }
 

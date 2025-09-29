@@ -151,6 +151,7 @@ export const TEST_CARD_STRINGS = {
   attempts: "attempts",
   startTest: "Start Test",
   studyMode: "Study Mode",
+  notYetAttempted: "Not yet attempted",
 };
 
 export const DASHBOARD_STRINGS = {

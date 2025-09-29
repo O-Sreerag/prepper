@@ -82,9 +82,13 @@ export function TestCard({ test }: TestCardProps) {
           )}
         </div>
 
-        {test.lastAttempt && (
+        {test.lastAttempt ? (
           <div className="text-xs text-muted-foreground">
             {STRINGS.lastAttempt} {test.lastAttempt} • {test.attempts} {STRINGS.attempts}
+          </div>
+        ) : (
+          <div className="text-xs text-muted-foreground">
+            {STRINGS.notYetAttempted}
           </div>
         )}
 

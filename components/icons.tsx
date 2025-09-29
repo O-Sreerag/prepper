@@ -22,6 +22,7 @@ import {
   Award,
   Zap,
   Menu,
+  LogOut,
 } from "lucide-react"
 
 export const Icons = {
@@ -51,6 +52,7 @@ export const Icons = {
   ),
   mail: Mail,
   user: User,
+  logout: LogOut, 
   bookOpen: BookOpen,
   target: Target,
   calendar: Calendar,
