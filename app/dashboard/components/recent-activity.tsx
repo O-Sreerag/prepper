@@ -2,48 +2,27 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Icons } from "@/components/icons"
+import { RECENT_ACTIVITY_STRINGS as STRINGS } from "@/constants"
 
-const activities = [
-  {
-    type: "test",
-    title: "Physics Mock Test #12",
-    description: "Scored 78/100",
-    time: "2 hours ago",
-    icon: Icons.fileText,
-    color: "text-blue-500",
-  },
-  {
-    type: "study",
-    title: "Organic Chemistry",
-    description: "45 minutes study session",
-    time: "5 hours ago",
-    icon: Icons.bookOpen,
-    color: "text-green-500",
-  },
-  {
-    type: "flashcard",
-    title: "Mathematics Formulas",
-    description: "Reviewed 23 cards",
-    time: "1 day ago",
-    icon: Icons.brain,
-    color: "text-purple-500",
-  },
-  {
-    type: "goal",
-    title: "Weekly Goal Achieved",
-    description: "Solved 150 questions",
-    time: "2 days ago",
-    icon: Icons.target,
-    color: "text-orange-500",
-  },
-]
+interface Activity {
+  type: string
+  title: string
+  description: string
+  time: string
+  icon: React.ElementType
+  color: string
+}
 
-export function RecentActivity() {
+interface RecentActivityProps {
+  activities: Activity[]
+}
+
+export function RecentActivity({ activities }: RecentActivityProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Activity</CardTitle>
-        <CardDescription>Your latest study sessions and achievements</CardDescription>
+        <CardTitle>{STRINGS.title}</CardTitle>
+        <CardDescription>{STRINGS.description}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

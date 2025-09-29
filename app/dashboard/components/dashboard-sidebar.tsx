@@ -4,17 +4,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
 import { usePathname } from "next/navigation"
-
-const navigation = [
-  { name: "Overview", href: "/dashboard", icon: Icons.barChart },
-  { name: "Mock Tests", href: "/dashboard/tests", icon: Icons.fileText },
-  { name: "Study Mode", href: "/dashboard/study", icon: Icons.bookOpen },
-  { name: "Flashcards", href: "/dashboard/flashcards", icon: Icons.brain },
-  { name: "Analytics", href: "/dashboard/analytics", icon: Icons.trendingUp },
-  { name: "Goals", href: "/dashboard/goals", icon: Icons.target },
-  { name: "Planner", href: "/dashboard/planner", icon: Icons.calendar },
-  { name: "AI Tutor", href: "/dashboard/tutor", icon: Icons.zap },
-]
+import { DASHBOARD_SIDEBAR_STRINGS as STRINGS, DASHBOARD_SIDEBAR_NAVIGATION } from "@/constants"
 
 export function DashboardSidebar() {
   const pathname = usePathname()
@@ -27,13 +17,14 @@ export function DashboardSidebar() {
           <div className="h-8 w-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
             <Icons.bookOpen className="h-4 w-4 text-sidebar-primary-foreground" />
           </div>
-          <span className="text-lg font-semibold text-sidebar-foreground">ExamPrep</span>
+          <span className="text-lg font-semibold text-sidebar-foreground">{STRINGS.logo}</span>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 p-4">
-        {navigation.map((item) => {
+        {DASHBOARD_SIDEBAR_NAVIGATION.map((item) => {
+          const Icon = Icons[item.iconName as keyof typeof Icons]
           const isActive = pathname === item.href
           return (
             <Button
@@ -48,7 +39,7 @@ export function DashboardSidebar() {
               asChild
             >
               <a href={item.href}>
-                <item.icon className="h-4 w-4" />
+                <Icon className="h-4 w-4" />
                 {item.name}
               </a>
             </Button>
@@ -60,7 +51,7 @@ export function DashboardSidebar() {
       <div className="p-4 border-t border-sidebar-border">
         <Button variant="outline" className="w-full justify-start gap-3 bg-transparent" size="sm">
           <Icons.user className="h-4 w-4" />
-          Account Settings
+          {STRINGS.accountSettings}
         </Button>
       </div>
     </div>

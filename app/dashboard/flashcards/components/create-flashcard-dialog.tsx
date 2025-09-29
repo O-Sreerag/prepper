@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Icons } from "@/components/icons"
+import { CREATE_FLASHCARD_DIALOG_STRINGS as STRINGS } from "@/constants"
 
 interface CreateFlashcardDialogProps {
   open: boolean
@@ -30,120 +31,121 @@ export function CreateFlashcardDialog({ open, onOpenChange }: CreateFlashcardDia
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Create Flashcard Deck</DialogTitle>
-          <DialogDescription>Create flashcards manually or let AI generate them from your content</DialogDescription>
+          <DialogTitle>{STRINGS.title}</DialogTitle>
+          <DialogDescription>{STRINGS.description}</DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="manual" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="manual">Manual Creation</TabsTrigger>
-            <TabsTrigger value="ai">AI Generation</TabsTrigger>
+            <TabsTrigger value="manual">{STRINGS.manualCreation}</TabsTrigger>
+            <TabsTrigger value="ai">{STRINGS.aiGeneration}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="manual" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="deck-title">Deck Title</Label>
-                <Input id="deck-title" placeholder="e.g., Physics Formulas" />
+                <Label htmlFor="deck-title">{STRINGS.deckTitle}</Label>
+                <Input id="deck-title" placeholder={STRINGS.deckTitlePlaceholder} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
+                <Label htmlFor="subject">{STRINGS.subject}</Label>
                 <Select>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select subject" />
+                    <SelectValue placeholder={STRINGS.selectSubject} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="physics">Physics</SelectItem>
-                    <SelectItem value="chemistry">Chemistry</SelectItem>
-                    <SelectItem value="mathematics">Mathematics</SelectItem>
-                    <SelectItem value="biology">Biology</SelectItem>
+                    {Object.entries(STRINGS.subjects).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div className="space-y-4">
-              <h4 className="font-medium">Add Cards</h4>
+              <h4 className="font-medium">{STRINGS.addCards}</h4>
               <div className="space-y-4 border rounded-lg p-4">
                 <div className="space-y-2">
-                  <Label htmlFor="front">Front (Question)</Label>
-                  <Textarea id="front" placeholder="What is Newton's second law?" />
+                  <Label htmlFor="front">{STRINGS.frontLabel}</Label>
+                  <Textarea id="front" placeholder={STRINGS.frontPlaceholder} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="back">Back (Answer)</Label>
-                  <Textarea id="back" placeholder="F = ma (Force equals mass times acceleration)" />
+                  <Label htmlFor="back">{STRINGS.backLabel}</Label>
+                  <Textarea id="back" placeholder={STRINGS.backPlaceholder} />
                 </div>
                 <Button size="sm" variant="outline" className="bg-transparent">
                   <Icons.brain className="mr-2 h-4 w-4" />
-                  Add Card
+                  {STRINGS.addCard}
                 </Button>
               </div>
             </div>
 
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+                {STRINGS.cancel}
               </Button>
-              <Button>Create Deck</Button>
+              <Button>{STRINGS.createDeck}</Button>
             </div>
           </TabsContent>
 
           <TabsContent value="ai" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="ai-deck-title">Deck Title</Label>
-                <Input id="ai-deck-title" placeholder="e.g., Organic Chemistry Reactions" />
+                <Label htmlFor="ai-deck-title">{STRINGS.deckTitle}</Label>
+                <Input id="ai-deck-title" placeholder={STRINGS.aiDeckTitlePlaceholder} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="ai-subject">Subject</Label>
+                <Label htmlFor="ai-subject">{STRINGS.subject}</Label>
                 <Select>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select subject" />
+                    <SelectValue placeholder={STRINGS.selectSubject} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="physics">Physics</SelectItem>
-                    <SelectItem value="chemistry">Chemistry</SelectItem>
-                    <SelectItem value="mathematics">Mathematics</SelectItem>
-                    <SelectItem value="biology">Biology</SelectItem>
+                    {Object.entries(STRINGS.subjects).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="content">Content Source</Label>
-              <Textarea
-                id="content"
-                placeholder="Paste your notes, textbook content, or any material you want to convert into flashcards..."
-                className="min-h-[120px]"
-              />
+              <Label htmlFor="content">{STRINGS.contentSource}</Label>
+              <Textarea id="content" placeholder={STRINGS.contentSourcePlaceholder} className="min-h-[120px]" />
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="card-count">Number of Cards</Label>
+                <Label htmlFor="card-count">{STRINGS.numCards}</Label>
                 <Select>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select count" />
+                    <SelectValue placeholder={STRINGS.selectNumCards} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="10">10 cards</SelectItem>
-                    <SelectItem value="20">20 cards</SelectItem>
-                    <SelectItem value="30">30 cards</SelectItem>
-                    <SelectItem value="50">50 cards</SelectItem>
+                    {Object.entries(STRINGS.numCardOptions).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="ai-difficulty">Difficulty Level</Label>
+                <Label htmlFor="ai-difficulty">{STRINGS.difficulty}</Label>
                 <Select>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select difficulty" />
+                    <SelectValue placeholder={STRINGS.selectDifficulty} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="easy">Easy</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="hard">Hard</SelectItem>
+                    {Object.entries(STRINGS.difficultyOptions).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -151,11 +153,11 @@ export function CreateFlashcardDialog({ open, onOpenChange }: CreateFlashcardDia
 
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+                {STRINGS.cancel}
               </Button>
               <Button onClick={handleAIGenerate} disabled={isGenerating}>
                 {isGenerating && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-                Generate with AI
+                {STRINGS.generateWithAI}
               </Button>
             </div>
           </TabsContent>

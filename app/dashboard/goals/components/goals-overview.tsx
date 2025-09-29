@@ -6,66 +6,35 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Icons } from "@/components/icons"
-import { CreateGoalDialog } from "@/components/create-goal-dialog"
+import { CreateGoalDialog } from "./create-goal-dialog"
+import { GOALS_OVERVIEW_STRINGS as STRINGS } from "@/constants"
 
-const mockGoals = [
-  {
-    id: 1,
-    title: "Solve 150 Physics Questions",
-    description: "Complete 150 physics questions this week",
-    type: "weekly",
-    target: 150,
-    current: 127,
-    deadline: "2024-03-15",
-    status: "active",
-    priority: "high",
-    subject: "Physics",
-  },
-  {
-    id: 2,
-    title: "Study 25 Hours This Month",
-    description: "Maintain consistent study schedule",
-    type: "monthly",
-    target: 25,
-    current: 18.5,
-    deadline: "2024-03-31",
-    status: "active",
-    priority: "medium",
-    subject: "General",
-  },
-  {
-    id: 3,
-    title: "Complete 5 Mock Tests",
-    description: "Take and analyze 5 full-length mock tests",
-    type: "monthly",
-    target: 5,
-    current: 3,
-    deadline: "2024-03-31",
-    status: "active",
-    priority: "high",
-    subject: "General",
-  },
-  {
-    id: 4,
-    title: "Master Organic Chemistry",
-    description: "Complete all organic chemistry flashcards",
-    type: "custom",
-    target: 100,
-    current: 100,
-    deadline: "2024-03-10",
-    status: "completed",
-    priority: "medium",
-    subject: "Chemistry",
-  },
-]
+interface Goal {
+  id: number
+  title: string
+  description: string
+  type: string
+  target: number
+  current: number
+  deadline: string
+  status: string
+  priority: string
+  subject: string
+}
 
-export function GoalsOverview() {
+interface GoalsOverviewProps {
+  goals: Goal[]
+}
+
+export function GoalsOverview({ goals }: GoalsOverviewProps) {
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
 
-  const activeGoals = mockGoals.filter((goal) => goal.status === "active")
-  const completedGoals = mockGoals.filter((goal) => goal.status === "completed")
+  const activeGoals = goals.filter((goal) => goal.status === "active")
+  const completedGoals = goals.filter((goal) => goal.status === "completed")
   const totalProgress =
-    activeGoals.reduce((sum, goal) => sum + (goal.current / goal.target) * 100, 0) / activeGoals.length
+    activeGoals.length > 0
+      ? activeGoals.reduce((sum, goal) => sum + (goal.current / goal.target) * 100, 0) / activeGoals.length
+      : 0
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -98,12 +67,12 @@ export function GoalsOverview() {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Goals & Targets</h2>
-          <p className="text-muted-foreground">Track your progress and stay motivated</p>
+          <h2 className="text-2xl font-bold text-foreground">{STRINGS.title}</h2>
+          <p className="text-muted-foreground">{STRINGS.description}</p>
         </div>
         <Button onClick={() => setCreateDialogOpen(true)}>
           <Icons.target className="mr-2 h-4 w-4" />
-          Create Goal
+          {STRINGS.createGoal}
         </Button>
       </div>
 
@@ -111,52 +80,52 @@ export function GoalsOverview() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Goals</CardTitle>
+            <CardTitle className="text-sm font-medium">{STRINGS.activeGoals}</CardTitle>
             <Icons.target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{activeGoals.length}</div>
-            <p className="text-xs text-muted-foreground">In progress</p>
+            <p className="text-xs text-muted-foreground">{STRINGS.inProgress}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed</CardTitle>
+            <CardTitle className="text-sm font-medium">{STRINGS.completed}</CardTitle>
             <Icons.checkCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{completedGoals.length}</div>
-            <p className="text-xs text-muted-foreground">This month</p>
+            <p className="text-xs text-muted-foreground">{STRINGS.thisMonth}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Progress</CardTitle>
+            <CardTitle className="text-sm font-medium">{STRINGS.averageProgress}</CardTitle>
             <Icons.trendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{Math.round(totalProgress)}%</div>
-            <p className="text-xs text-muted-foreground">Across active goals</p>
+            <p className="text-xs text-muted-foreground">{STRINGS.acrossActiveGoals}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Streak</CardTitle>
+            <CardTitle className="text-sm font-medium">{STRINGS.streak}</CardTitle>
             <Icons.zap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">Days achieving goals</p>
+            <p className="text-xs text-muted-foreground">{STRINGS.streakDescription}</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Active Goals */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Active Goals</h3>
+        <h3 className="text-lg font-semibold">{STRINGS.activeGoals}</h3>
         <div className="grid gap-4 md:grid-cols-2">
           {activeGoals.map((goal) => (
             <Card key={goal.id} className="hover:shadow-md transition-shadow">
@@ -179,9 +148,9 @@ export function GoalsOverview() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Progress</span>
+                    <span>{STRINGS.progress}</span>
                     <span>
-                      {goal.current} / {goal.target} {goal.type === "monthly" && goal.target === 25 ? "hours" : ""}
+                      {goal.current} / {goal.target} {goal.type === "monthly" && goal.target === 25 ? STRINGS.hours : ""}
                     </span>
                   </div>
                   <Progress value={(goal.current / goal.target) * 100} className="h-2" />
@@ -190,7 +159,7 @@ export function GoalsOverview() {
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <Icons.calendar className="h-4 w-4" />
-                    Due: {new Date(goal.deadline).toLocaleDateString()}
+                    {STRINGS.due} {new Date(goal.deadline).toLocaleDateString()}
                   </div>
                   <div className="flex items-center gap-1">
                     <Icons.bookOpen className="h-4 w-4" />
@@ -201,7 +170,7 @@ export function GoalsOverview() {
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" className="flex-1 bg-transparent">
                     <Icons.trendingUp className="mr-2 h-4 w-4" />
-                    View Details
+                    {STRINGS.viewDetails}
                   </Button>
                   <Button size="sm" variant="outline" className="bg-transparent">
                     <Icons.fileText className="h-4 w-4" />
@@ -216,7 +185,7 @@ export function GoalsOverview() {
       {/* Completed Goals */}
       {completedGoals.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Recently Completed</h3>
+          <h3 className="text-lg font-semibold">{STRINGS.recentlyCompleted}</h3>
           <div className="grid gap-4 md:grid-cols-3">
             {completedGoals.map((goal) => (
               <Card key={goal.id} className="bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800">
@@ -233,7 +202,7 @@ export function GoalsOverview() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-sm text-muted-foreground">
-                    Completed on {new Date(goal.deadline).toLocaleDateString()}
+                    {STRINGS.completedOn} {new Date(goal.deadline).toLocaleDateString()}
                   </div>
                 </CardContent>
               </Card>
