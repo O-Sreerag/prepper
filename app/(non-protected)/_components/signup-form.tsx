@@ -8,26 +8,26 @@ import { Label } from "@/components/ui/label"
 import { Icons } from "@/components/icons"
 import { AuthService } from "@/services/api/auth.service"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
   const authService = new AuthService()
   const router = useRouter()
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     setIsLoading(true)
-    setError(null)
 
     try {
       await authService.signUp(fullName, email, password)
+      toast.success("Account created successfully!")
       router.push("/")
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred.")
+      toast.error(err instanceof Error ? err.message : "An unexpected error occurred.")
     } finally {
       setIsLoading(false)
     }
@@ -35,7 +35,6 @@ export function SignupForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <p className="text-red-500">{error}</p>}
       <div className="space-y-2">
         <Label htmlFor="name">Full Name</Label>
         <Input

@@ -7,25 +7,22 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Icons } from "@/components/icons"
 import { AuthService } from "@/services/api/auth.service"
+import { toast } from "sonner"
 
 export function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
-  const [message, setMessage] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
   const authService = new AuthService()
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     setIsLoading(true)
-    setError(null)
-    setMessage(null)
 
     try {
       await authService.forgotPassword(email)
-      setMessage("Password reset link has been sent to your email.")
+      toast.success("Password reset link has been sent to your email.")
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred.")
+      toast.error(err instanceof Error ? err.message : "An unexpected error occurred.")
     } finally {
       setIsLoading(false)
     }
@@ -33,8 +30,6 @@ export function ForgotPasswordForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <p className="text-red-500">{error}</p>}
-      {message && <p className="text-green-500">{message}</p>}
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
