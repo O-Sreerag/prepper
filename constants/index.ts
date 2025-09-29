@@ -202,14 +202,14 @@ export const DASHBOARD_SIDEBAR_STRINGS = {
 };
 
 export const DASHBOARD_SIDEBAR_NAVIGATION = [
-  { name: "Overview", href: "/dashboard", iconName: "barChart" },
-  { name: "Mock Tests", href: "/dashboard/tests", iconName: "fileText" },
-  { name: "Study Mode", href: "/dashboard/study", iconName: "bookOpen" },
-  { name: "Flashcards", href: "/dashboard/flashcards", iconName: "brain" },
-  { name: "Analytics", href: "/dashboard/analytics", iconName: "trendingUp" },
-  { name: "Goals", href: "/dashboard/goals", iconName: "target" },
-  { name: "Planner", href: "/dashboard/planner", iconName: "calendar" },
-  { name: "AI Tutor", href: "/dashboard/tutor", iconName: "zap" },
+  { name: "Overview", href: "/", iconName: "barChart" },
+  { name: "Mock Tests", href: "/tests", iconName: "fileText" },
+  { name: "Study Mode", href: "/study", iconName: "bookOpen" },
+  { name: "Flashcards", href: "/flashcards", iconName: "brain" },
+  { name: "Analytics", href: "/analytics", iconName: "trendingUp" },
+  { name: "Goals", href: "/goals", iconName: "target" },
+  { name: "Planner", href: "/planner", iconName: "calendar" },
+  { name: "AI Tutor", href: "/tutor", iconName: "zap" },
 ];
 
 export const UPLOAD_TEST_DIALOG_STRINGS = {

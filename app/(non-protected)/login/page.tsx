@@ -1,7 +1,7 @@
 import { AuthForm } from "@/components/auth-form"
 import { ThemeToggle } from "@/components/theme-toggle"
 
-export default function HomePage() {
+export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="absolute top-4 right-4">

@@ -1,4 +1,4 @@
-import { DashboardLayout } from "../components/dashboard-layout"
+import { DashboardLayout } from "../_components/dashboard-layout"
 import { StudyMode } from "./components/study-mode"
 
 const mockQuestion = {

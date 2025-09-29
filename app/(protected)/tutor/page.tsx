@@ -1,4 +1,4 @@
-import { DashboardLayout } from "../components/dashboard-layout"
+import { DashboardLayout } from "../_components/dashboard-layout"
 import { AITutor } from "./components/ai-tutor"
 
 export default function TutorPage() {

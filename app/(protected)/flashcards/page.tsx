@@ -1,4 +1,4 @@
-import { DashboardLayout } from "../components/dashboard-layout"
+import { DashboardLayout } from "../_components/dashboard-layout"
 import { FlashcardsOverview } from "./components/flashcards-overview"
 
 const mockDecks = [
