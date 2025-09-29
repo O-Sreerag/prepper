@@ -7,6 +7,7 @@ import { StudyStreakCard } from "./study-streak-card"
 import { PerformanceChart } from "./performance-chart"
 import { RecentActivity } from "./recent-activity"
 import { ExamCountdown } from "./exam-countdown"
+import { UploadQuestionPaper } from "./upload-question-paper"
 import { DASHBOARD_STRINGS as STRINGS } from "@/constants"
 
 const activities = [
@@ -117,6 +118,7 @@ export function DashboardOverview() {
 
         {/* Right Column */}
         <div className="space-y-4 sm:space-y-6">
+          <UploadQuestionPaper />
           <StudyStreakCard currentStreak={streak.current} longestStreak={streak.longest} />
           <RecentActivity activities={activities} />
         </div>
