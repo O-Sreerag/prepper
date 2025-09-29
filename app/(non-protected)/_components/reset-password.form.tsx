@@ -8,34 +8,31 @@ import { Label } from "@/components/ui/label"
 import { Icons } from "@/components/icons"
 import { AuthService } from "@/services/api/auth.service"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
   const authService = new AuthService()
   const router = useRouter()
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     setIsLoading(true)
-    setError(null)
-    setMessage(null)
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.")
+      toast.error("Passwords do not match.")
       setIsLoading(false)
       return
     }
 
     try {
       await authService.resetPassword(password)
-      setMessage("Password updated successfully! Redirecting to login...")
+      toast.success("Password updated successfully! Redirecting to login...")
       setTimeout(() => router.push("/login"), 2000)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred.")
+      toast.error(err instanceof Error ? err.message : "An unexpected error occurred.")
     } finally {
       setIsLoading(false)
     }
@@ -43,9 +40,6 @@ export function ResetPasswordForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <p className="text-red-500">{error}</p>}
-      {message && <p className="text-green-500">{message}</p>}
-
       <div className="space-y-2">
         <Label htmlFor="password">New Password</Label>
         <Input
