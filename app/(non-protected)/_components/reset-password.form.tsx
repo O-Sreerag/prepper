@@ -1,14 +1,15 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
+import { useRouter } from "next/navigation"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Icons } from "@/components/icons"
 import { AuthService } from "@/services/api/auth.service"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
+import { toastWithTimeout, ToastVariant } from "@/hooks/use-toast"
+import { showErrorMessage } from "@/lib/utils"
 
 export function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false)
@@ -22,17 +23,17 @@ export function ResetPasswordForm() {
     setIsLoading(true)
 
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match.")
+      toastWithTimeout(ToastVariant.Error, "Passwords do not match.")
       setIsLoading(false)
       return
     }
 
     try {
       await authService.resetPassword(password)
-      toast.success("Password updated successfully! Redirecting to login...")
+      toastWithTimeout(ToastVariant.Success, "Password updated successfully! Redirecting to login...")
       setTimeout(() => router.push("/login"), 2000)
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "An unexpected error occurred.")
+      showErrorMessage({ error: err, fallbackMessage: "An unexpected error occurred." })
     } finally {
       setIsLoading(false)
     }

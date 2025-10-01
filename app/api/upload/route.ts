@@ -1,78 +1,94 @@
-import { NextResponse } from "next/server"
-import { GoogleGenerativeAI, Part } from "@google/generative-ai"
+import { NextResponse } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 
-// Get API key from environment variables
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string)
-
-/**
- * Converts a file buffer to a GoogleGenerativeAI.Part object.
- * @param {Buffer} buffer The file buffer.
- * @param {string} mimeType The MIME type of the file.
- * @returns {GoogleGenerativeAI.Part} The Part object for the API call.
- */
-function fileToGenerativePart(buffer: Buffer, mimeType: string): Part {
-  return {
-    inlineData: {
-      data: buffer.toString("base64"),
-      mimeType,
-    },
-  }
-}
+import { createClient } from "@/services/supabase/server";
+import { uploadSchema } from "@/app/(protected)/question-papers/_schemas";
+import { formDataToObject } from "@/lib/utils";
 
 export async function POST(request: Request) {
-  const data = await request.formData()
-  const file: File | null = data.get("file") as unknown as File
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!file) {
-    return NextResponse.json({ success: false, error: "No file provided." }, { status: 400 })
+  if (!user) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
 
-  // Convert file to buffer
-  const bytes = await file.arrayBuffer()
-  const buffer = Buffer.from(bytes)
-
-  // Use a generative model that supports vision
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
-
-  // Prompt for question extraction
-  const prompt = `
-    Extract all questions from this document. For each question, provide:
-    - The question text.
-    - The multiple-choice options.
-    - The correct answer's letter (e.g., "A", "B", "C").
-    - A brief explanation (if available, otherwise null).
-    Return the data as a structured JSON array, like this:
-    [
-      {
-        "question": "What is the capital of France?",
-        "options": ["A. London", "B. Berlin", "C. Paris", "D. Madrid"],
-        "answer": "C",
-        "explanation": "Paris is the capital and most populous city of France."
-      }
-    ]
-  `
-
-  // Create the image part for the API call
-  const imagePart = fileToGenerativePart(buffer, file.type)
-
   try {
-    // Generate content using the prompt and the image
-    const result = await model.generateContent([prompt, imagePart])
-    const response = result.response
-    const text = response.text()
+    const formData = await request.formData();
+    const obj = formDataToObject(formData);
 
-    // Assuming the response is a JSON string, parse it
-    const structuredQuestions = JSON.parse(text)
+    const parsed = uploadSchema.safeParse(obj);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, error: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json({
-      success: true,
-      data: structuredQuestions,
-    })
+    const { title, subject, duration, difficulty, description, tags } = parsed.data;
+
+    const questionFile = formData.get("questionFile") as File | null;
+    const answerFile = formData.get("answerFile") as File | null;
+
+    if (!questionFile) {
+      return NextResponse.json({ success: false, error: "Missing question file" }, { status: 400 });
+    }
+
+    // --- DB Insert ---
+    const { data: jobData, error: jobError } = await supabase
+      .from("upload_jobs")
+      .insert({
+        user_id: user.id,
+        title,
+        subject,
+        duration_minutes: duration ? parseInt(duration, 10) : null,
+        difficulty: difficulty || null,
+        description: description || null,
+        tags: tags ? tags.split(",").map(tag => tag.trim()) : [],
+        status: "queued",
+      })
+      .select()
+      .single();
+
+    if (jobError) throw jobError;
+    const uploadJobId = jobData.id;
+
+    // --- File Upload ---
+    const questionPath = `${user.id}/${uploadJobId}/${uuidv4()}-${questionFile.name}`;
+    const { error: qErr } = await supabase.storage.from("uploads").upload(questionPath, questionFile);
+    if (qErr) throw qErr;
+
+    await supabase.from("upload_files").insert({
+      upload_job_id: uploadJobId,
+      user_id: user.id,
+      storage_url: questionPath,
+      filename: questionFile.name,
+      mime_type: questionFile.type,
+      file_role: "questions",
+    });
+
+    if (answerFile) {
+      const answerPath = `${user.id}/${uploadJobId}/${uuidv4()}-${answerFile.name}`;
+      const { error: aErr } = await supabase.storage.from("uploads").upload(answerPath, answerFile);
+      if (!aErr) {
+        await supabase.from("upload_files").insert({
+          upload_job_id: uploadJobId,
+          user_id: user.id,
+          storage_url: answerPath,
+          filename: answerFile.name,
+          mime_type: answerFile.type,
+          file_role: "answers",
+        });
+      }
+    }
+
+    return NextResponse.json({ success: true, upload_job_id: uploadJobId });
+
   } catch (error) {
-    console.error("Gemini API call failed:", error)
+    console.error(error);
     return NextResponse.json(
-      { success: false, error: "Failed to process the document with AI." },
-      { status: 500 },
-    )
+      { success: false, error: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
   }
 }

@@ -1,13 +1,14 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Icons } from "@/components/icons"
 import { AuthService } from "@/services/api/auth.service"
-import { toast } from "sonner"
+import { toastWithTimeout, ToastVariant } from "@/hooks/use-toast"
+import { showErrorMessage } from "@/lib/utils"
 
 export function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false)
@@ -20,9 +21,9 @@ export function ForgotPasswordForm() {
 
     try {
       await authService.forgotPassword(email)
-      toast.success("Password reset link has been sent to your email.")
+      toastWithTimeout(ToastVariant.Success, "Password reset link has been sent to your email.")
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "An unexpected error occurred.")
+      showErrorMessage({ error: err, fallbackMessage: "An unexpected error occurred." })
     } finally {
       setIsLoading(false)
     }

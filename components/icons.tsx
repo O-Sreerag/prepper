@@ -23,6 +23,7 @@ import {
   Zap,
   Menu,
   LogOut,
+  ArrowLeft,
 } from "lucide-react"
 
 export const Icons = {
@@ -70,4 +71,5 @@ export const Icons = {
   award: Award,
   zap: Zap,
   menu: Menu,
+  arrowLeft: ArrowLeft,
 }
