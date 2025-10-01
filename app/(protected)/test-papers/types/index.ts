@@ -4,8 +4,8 @@ export type UploadStatusType = "queued" | "processing" | "failed" | "review" | "
 
 export type FileRoleType = "questions" | "answers";
 
-export interface UploadJobType {
-  id: string;
+export interface TestPaperType {
+  test_paper_id: string;
   user_id: string;
   title: string;
   subject: string;
@@ -19,8 +19,8 @@ export interface UploadJobType {
 }
 
 export interface UploadFileType {
-  id: string;
-  upload_job_id: string;
+  upload_file_id: string;
+  test_paper_id: string;
   user_id: string;
   storage_url: string;
   filename: string;

@@ -130,11 +130,11 @@ export const CREATE_GOAL_DIALOG_STRINGS = {
   },
 };
 
-export const QUESTION_PAPERS_OVERVIEW_STRINGS = {
-  title: "Question Papers",
-  description: "Manage your uploaded question papers and track their processing status.",
+export const TEST_PAPERS_OVERVIEW_STRINGS = {
+  title: "Test Papers",
+  description: "Manage your uploaded test papers and track their processing status.",
   uploadNewPaper: "Upload New Paper",
-  getStartedDescription: "Get started by uploading your first question paper.",
+  getStartedDescription: "Get started by uploading your first test paper.",
   noUploadJobsFound: "No upload jobs found",
   uploadedOn: "Uploaded on",
 };

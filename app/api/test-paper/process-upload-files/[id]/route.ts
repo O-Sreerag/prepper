@@ -2,27 +2,28 @@ import { NextResponse } from "next/server"
 
 import { createClient } from "@/services/supabase/server"
 import { processQuestionPaperWithGemini } from "@/lib/gemini"
+import { SUPABASE_DB_BUCKET_CONSTANTS, SUPABASE_DB_TABLES_CONSTANTS } from "@/constants"
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
     const supabase = createClient()
-    const uploadJobId = params.id
+    const testPaperId = params.id
 
     try {
-        // 1. Fetch job
-        const { data: job } = await supabase.from("upload_jobs").select("*").eq("id", uploadJobId).single()
-        if (!job) throw new Error("Job not found")
+        // 1. Fetch test paper
+        const { data: testPaper } = await supabase.from(SUPABASE_DB_TABLES_CONSTANTS.test_papers).select("*").eq("test_paper_id", testPaperId).single()
+        if (!testPaper) throw new Error("Test paper not found")
 
-        await supabase.from("upload_jobs").update({ status: "processing", last_error: null }).eq("id", uploadJobId)
+        await supabase.from(SUPABASE_DB_TABLES_CONSTANTS.test_papers).update({ status: "processing", last_error: null }).eq("test_paper_id", testPaperId)
 
         // 2. Fetch question file from storage
-        const { data: fileMeta } = await supabase.from("upload_files")
+        const { data: fileMeta } = await supabase.from(SUPABASE_DB_TABLES_CONSTANTS.upload_files)
             .select("*")
-            .eq("upload_job_id", uploadJobId)
+            .eq("test_paper_id", testPaperId)
             .eq("file_role", "questions")
             .single()
         if (!fileMeta) throw new Error("Question file not found")
 
-        const fileRes = await supabase.storage.from("uploads").download(fileMeta.storage_url)
+        const fileRes = await supabase.storage.from(SUPABASE_DB_BUCKET_CONSTANTS.uploads).download(fileMeta.storage_url)
 
         if (fileRes.error || !fileRes.data) {
             throw new Error(fileRes.error?.message || "Failed to download file")
@@ -37,7 +38,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
         // 4. Insert parsed questions
         const questionsToInsert = parsedData.map((q, i) => ({
-            upload_job_id: uploadJobId,
+            test_paper_id: testPaperId,
             sequence_in_doc: i + 1,
             question_text: q.question,
             options: { options: q.options },
@@ -45,16 +46,16 @@ export async function POST(request: Request, { params }: { params: { id: string 
             parse_confidence: 0.9,
             review_status: 'pending',
         }))
-        await supabase.from("parsed_questions").insert(questionsToInsert)
+        await supabase.from(SUPABASE_DB_TABLES_CONSTANTS.parsed_questions).insert(questionsToInsert)
 
         // 5. Update job status
-        await supabase.from("upload_jobs").update({ status: "review" }).eq("id", uploadJobId)
+        await supabase.from(SUPABASE_DB_TABLES_CONSTANTS.test_papers).update({ status: "review" }).eq("test_paper_id", testPaperId)
 
-        return NextResponse.json({ success: true })
+        return NextResponse.json({ success: true }) 
     } catch (err) {
         const message = err instanceof Error ? err.message : "Unknown error"
         console.error("Processing failed:", message)
-        await supabase.from("upload_jobs").update({ status: "failed", last_error: message }).eq("id", uploadJobId)
+        await supabase.from(SUPABASE_DB_TABLES_CONSTANTS.test_papers).update({ status: "failed", last_error: message }).eq("test_paper_id", testPaperId)
         return NextResponse.json({ success: false, error: message }, { status: 500 })
     }
 }

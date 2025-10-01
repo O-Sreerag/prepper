@@ -3,27 +3,27 @@
 import { useState, useEffect, useCallback } from "react"
 
 import { Button } from "@/components/ui/button"
-import { UploadPaperDialog } from "./upload-paper-dailog"
-import { QuestionReview } from "./question-papers-review"
+import { UploadPaperDialog } from "./upload-test-paper-dailog"
+import { QuestionReview } from "./test-papers-review"
 import { Icons } from "@/components/icons"
-import { QUESTION_PAPERS_OVERVIEW_STRINGS as STRINGS } from "@/constants"
-import { UploadJobType } from "@/app/(protected)/question-papers/types"
+import { TEST_PAPERS_OVERVIEW_STRINGS as STRINGS } from "@/constants"
+import { TestPaperType } from "@/app/(protected)/test-papers/types"
 
-export function QuestionPapersOverview() {
+export function TestPapersOverview() {
   const [isUploadDialogOpen, setUploadDialogOpen] = useState(false)
-  const [jobs, setJobs] = useState<UploadJobType[]>([])
-  const [selectedJob, setSelectedJob] = useState<UploadJobType | null>(null)
+  const [testPapers, setTestPapers] = useState<TestPaperType[]>([])
+  const [selectedJob, setSelectedJob] = useState<TestPaperType | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchJobs = useCallback(async () => {
+  const fetchTestPapers = useCallback(async () => {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetch("/api/uploads")
+      const response = await fetch("/api/test-paper")
       const result = await response.json()
-      if (!result.success) throw new Error(result.error || "Failed to fetch jobs.")
-      setJobs(result.data)
+      if (!result.success) throw new Error(result.error || "Failed to fetch test papers.")
+      setTestPapers(result.data)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error occurred")
     } finally {
@@ -32,27 +32,28 @@ export function QuestionPapersOverview() {
   }, [])
 
   useEffect(() => {
-    fetchJobs()
-    const interval = setInterval(fetchJobs, 10000) // refresh every 10s
-    return () => clearInterval(interval)
-  }, [fetchJobs])
+    fetchTestPapers()
+    // const interval = setInterval(fetchTestPapers, 10000) // refresh every 10s
+    // return () => clearInterval(interval)
+  }, [fetchTestPapers]) 
 
-  const handleProcessJob = async (jobId: string) => {
+  const handleProcessTestPaper = async (testPaperId: string) => {
+    console.log("Processing test paper:", testPaperId)
     try {
-      const response = await fetch(`/api/process-upload/${jobId}`, { method: "POST" })
+      const response = await fetch(`/api/test-paper/process-upload-files/${testPaperId}`, { method: "POST" })
       const result = await response.json()
-      if (!result.success) throw new Error(result.error || "Failed to process job.")
-      fetchJobs()
+      if (!result.success) throw new Error(result.error || "Failed to process test paper.")
+      fetchTestPapers()
     } catch (err) {
       alert(err instanceof Error ? err.message : "Unknown error during processing.")
     }
   }
 
   if (selectedJob) {
-    return <QuestionReview job={selectedJob} onBack={() => setSelectedJob(null)} />
+    return <QuestionReview testPaper={selectedJob} onBack={() => setSelectedJob(null)} />
   }
 
-  const statusColors: Record<UploadJobType["status"], string> = {
+  const statusColors: Record<TestPaperType["status"], string> = {
     queued: "bg-yellow-100 text-yellow-800",
     processing: "bg-blue-100 text-blue-800",
     review: "bg-purple-100 text-purple-800",
@@ -89,46 +90,46 @@ export function QuestionPapersOverview() {
           </div>
         )}
 
-        {!isLoading && !error && jobs.length === 0 && (
+        {!isLoading && !error && testPapers.length === 0 && (
           <div className="border rounded-lg p-8 text-center">
             <h2 className="text-xl font-semibold">{STRINGS.noUploadJobsFound}</h2>
             <p className="text-muted-foreground mt-2">{STRINGS.getStartedDescription}</p>
           </div>
         )}
 
-        {!isLoading && !error && jobs.length > 0 && (
+        {!isLoading && !error && testPapers.length > 0 && (
           <div className="space-y-4">
-            {jobs.map((job) => (
-              <div key={job.id} className="border rounded-lg p-4 flex justify-between items-center">
+            {testPapers.map((testPaper) => (
+              <div key={testPaper.test_paper_id} className="border rounded-lg p-4 flex justify-between items-center">
                 <div>
-                  <h3 className="font-semibold">{job.title}</h3>
+                  <h3 className="font-semibold">{testPaper.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {job.subject} - {STRINGS.uploadedOn} {new Date(job.created_at).toLocaleDateString()}
+                    {testPaper.subject} - {STRINGS.uploadedOn} {new Date(testPaper.created_at).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
                   <span
-                    className={`text-sm font-medium capitalize px-2 py-1 rounded-md ${statusColors[job.status]}`}
+                    className={`text-sm font-medium capitalize px-2 py-1 rounded-md ${statusColors[testPaper.status]}`}
                   >
-                    {job.status}
+                    {testPaper.status}
                   </span>
 
-                  {["queued", "failed"].includes(job.status) && (
+                  {["queued", "failed"].includes(testPaper.status) && (
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleProcessJob(job.id)}
-                      disabled={job.status === "processing"}
+                      onClick={() => handleProcessTestPaper(testPaper.test_paper_id)}
+                      disabled={testPaper.status === "processing"}
                     >
-                      {job.status === "failed" ? "Retry Processing" : "Process"}
+                      {testPaper.status === "failed" ? "Retry Processing" : "Process"}
                     </Button>
                   )}
 
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setSelectedJob(job)}
-                    disabled={job.status !== "review"}
+                    onClick={() => setSelectedJob(testPaper)}
+                    disabled={testPaper.status !== "review"}
                   >
                     Review
                   </Button>

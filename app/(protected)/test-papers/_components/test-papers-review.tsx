@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { UploadJobType } from "@/app/(protected)/question-papers/types"
+import { TestPaperType } from "@/app/(protected)/test-papers/types"
 
 // Based on the DB schema for parsed_questions
 type ParsedQuestion = {
@@ -20,11 +20,11 @@ type ParsedQuestion = {
 };
 
 interface QuestionReviewProps {
-  job: UploadJobType;
+  testPaper: TestPaperType;
   onBack: () => void;
 }
 
-export function QuestionReview({ job, onBack }: QuestionReviewProps) {
+export function QuestionReview({ testPaper, onBack }: QuestionReviewProps) {
   const [questions, setQuestions] = useState<ParsedQuestion[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -33,7 +33,7 @@ export function QuestionReview({ job, onBack }: QuestionReviewProps) {
     async function fetchParsedQuestions() {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/uploads/${job.id}/parsed`);
+        const response = await fetch(`/api/uploads/${testPaper.test_paper_id}/parsed`);
         const result = await response.json();
         if (!result.success) {
           throw new Error(result.error || "Failed to fetch parsed questions.");
@@ -47,7 +47,7 @@ export function QuestionReview({ job, onBack }: QuestionReviewProps) {
       }
     }
     fetchParsedQuestions();
-  }, [job.id]);
+  }, [testPaper.test_paper_id]);
 
   return (
     <div className="container mx-auto py-8">
@@ -57,7 +57,7 @@ export function QuestionReview({ job, onBack }: QuestionReviewProps) {
                 <Icons.arrowLeft className="h-4 w-4" />
             </Button>
             <div>
-                <h1 className="text-3xl font-bold">Reviewing: {job.title}</h1>
+                <h1 className="text-3xl font-bold">Reviewing: {testPaper.title}</h1>
                 <p className="text-muted-foreground">
                     Review and confirm the questions extracted by the AI.
                 </p>

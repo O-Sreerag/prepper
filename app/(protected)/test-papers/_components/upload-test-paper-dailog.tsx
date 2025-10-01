@@ -8,8 +8,8 @@ import { Form } from "@/components/ui/form";
 import { GenericDialog } from "@/components/dailogs/generic";
 import { TextInputFormField, TextAreaFormField, SelectFormField, FileUploadFormField } from "@/components/form/fields";
 import { ToastVariant, toastWithTimeout } from "@/hooks/use-toast";
-import { UploadPaperInput, UploadPaperSchema } from "@/app/(protected)/question-papers/_schemas";
-import { TEST_PAPER_SUBJECT_OPTIONS, TEST_PAPER_DIFFICULTY_OPTIONS } from "@/app/(protected)/question-papers/_constants";
+import { UploadPaperInput, UploadPaperSchema } from "@/app/(protected)/test-papers/_schemas";
+import { TEST_PAPER_SUBJECT_OPTIONS, TEST_PAPER_DIFFICULTY_OPTIONS } from "@/app/(protected)/test-papers/_constants";
 import { showErrorMessage } from "@/lib/utils";
 
 interface UploadPaperDialogProps {
@@ -42,7 +42,7 @@ export function UploadPaperDialog({ open, onOpenChange }: UploadPaperDialogProps
         if (value !== undefined && value !== null) formData.append(key, value as any);
       });
 
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const res = await fetch("/api/test-paper/upload-files", { method: "POST", body: formData });
       const json = await res.json();
 
       if (!res.ok) throw new Error(json.error || "Upload failed");

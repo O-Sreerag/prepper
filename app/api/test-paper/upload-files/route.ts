@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 
 import { createClient } from "@/services/supabase/server";
-import { uploadSchema } from "@/app/(protected)/question-papers/_schemas";
+import { uploadSchema } from "@/app/(protected)/test-papers/_schemas";
 import { formDataToObject } from "@/lib/utils";
+import { SUPABASE_DB_BUCKET_CONSTANTS, SUPABASE_DB_TABLES_CONSTANTS } from "@/constants";
 
 export async function POST(request: Request) {
   const supabase = createClient();
@@ -35,8 +36,8 @@ export async function POST(request: Request) {
     }
 
     // --- DB Insert ---
-    const { data: jobData, error: jobError } = await supabase
-      .from("upload_jobs")
+    const { data: testPaperData, error: testPaperError } = await supabase
+      .from(SUPABASE_DB_TABLES_CONSTANTS.test_papers)
       .insert({
         user_id: user.id,
         title,
@@ -50,16 +51,16 @@ export async function POST(request: Request) {
       .select()
       .single();
 
-    if (jobError) throw jobError;
-    const uploadJobId = jobData.id;
+    if (testPaperError) throw testPaperError;
+    const testPaperId = testPaperData.test_paper_id;
 
     // --- File Upload ---
-    const questionPath = `${user.id}/${uploadJobId}/${uuidv4()}-${questionFile.name}`;
-    const { error: qErr } = await supabase.storage.from("uploads").upload(questionPath, questionFile);
+    const questionPath = `${user.id}/${testPaperId}/${uuidv4()}-${questionFile.name}`;
+    const { error: qErr } = await supabase.storage.from(SUPABASE_DB_BUCKET_CONSTANTS.uploads).upload(questionPath, questionFile);
     if (qErr) throw qErr;
 
-    await supabase.from("upload_files").insert({
-      upload_job_id: uploadJobId,
+    await supabase.from(SUPABASE_DB_TABLES_CONSTANTS.upload_files).insert({
+      test_paper_id: testPaperId,
       user_id: user.id,
       storage_url: questionPath,
       filename: questionFile.name,
@@ -68,11 +69,11 @@ export async function POST(request: Request) {
     });
 
     if (answerFile) {
-      const answerPath = `${user.id}/${uploadJobId}/${uuidv4()}-${answerFile.name}`;
-      const { error: aErr } = await supabase.storage.from("uploads").upload(answerPath, answerFile);
+      const answerPath = `${user.id}/${testPaperId}/${uuidv4()}-${answerFile.name}`;
+      const { error: aErr } = await supabase.storage.from(SUPABASE_DB_BUCKET_CONSTANTS.uploads).upload(answerPath, answerFile);
       if (!aErr) {
-        await supabase.from("upload_files").insert({
-          upload_job_id: uploadJobId,
+        await supabase.from(SUPABASE_DB_TABLES_CONSTANTS.upload_files).insert({
+          test_paper_id: testPaperId,
           user_id: user.id,
           storage_url: answerPath,
           filename: answerFile.name,
@@ -82,7 +83,7 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, upload_job_id: uploadJobId });
+    return NextResponse.json({ success: true, test_paper_id: testPaperId });
 
   } catch (error) {
     console.error(error);
