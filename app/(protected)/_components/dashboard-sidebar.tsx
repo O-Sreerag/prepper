@@ -7,53 +7,48 @@ import { usePathname } from "next/navigation"
 import { DASHBOARD_SIDEBAR_STRINGS as STRINGS, DASHBOARD_SIDEBAR_NAVIGATION } from "@/constants"
 
 export function DashboardSidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
-    <div className="flex h-full flex-col bg-sidebar border-r border-sidebar-border">
-      {/* Logo */}
-      <div className="flex h-16 items-center px-6 border-b border-sidebar-border">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
-            <Icons.bookOpen className="h-4 w-4 text-sidebar-primary-foreground" />
-          </div>
-          <span className="text-lg font-semibold text-sidebar-foreground">{STRINGS.logo}</span>
-        </div>
+    <div className="flex h-full flex-col bg-card border-r">
+      <div className="flex h-16 items-center px-6">
+        <a href="/dashboard" className="flex items-center gap-2 font-semibold">
+          <Icons.carrot className="h-6 w-6 text-primary" />
+          <span className="text-xl">{STRINGS.logo}</span>
+        </a>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-1 p-4">
+      <nav className="flex-1 space-y-2 p-4">
         {DASHBOARD_SIDEBAR_NAVIGATION.map((item) => {
-          const Icon = Icons[item.iconName as keyof typeof Icons]
-          const isActive = pathname === item.href
+          const Icon = Icons[item.iconName as keyof typeof Icons];
+          const isActive = pathname === item.href;
           return (
             <Button
               key={item.name}
-              variant={isActive ? "secondary" : "ghost"}
+              variant={isActive ? "default" : "ghost"}
               className={cn(
-                "w-full justify-start gap-3 h-10",
+                "w-full justify-start gap-3 h-11 rounded-lg",
                 isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  ? "text-primary-foreground shadow-lg"
+                  : "text-muted-foreground hover:text-foreground",
               )}
               asChild
             >
               <a href={item.href}>
-                <Icon className="h-4 w-4" />
-                {item.name}
+                <Icon className="h-5 w-5" />
+                <span className="text-base">{item.name}</span>
               </a>
             </Button>
-          )
+          );
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-sidebar-border">
-        <Button variant="outline" className="w-full justify-start gap-3 bg-transparent" size="sm">
-          <Icons.user className="h-4 w-4" />
-          {STRINGS.accountSettings}
+      <div className="mt-auto p-4">
+        <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground">
+          <Icons.settings className="h-5 w-5" />
+          <span className="text-base">{STRINGS.accountSettings}</span>
         </Button>
       </div>
     </div>
-  )
+  );
 }

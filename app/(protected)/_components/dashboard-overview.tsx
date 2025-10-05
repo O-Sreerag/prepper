@@ -79,50 +79,44 @@ const streak = {
 
 export function DashboardOverview() {
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Welcome Section */}
-      <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground">{STRINGS.welcome("Alex")}</h2>
-          <p className="text-sm sm:text-base text-muted-foreground">{STRINGS.progressOverview}</p>
+    <div className="space-y-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">{STRINGS.welcome("Alex")}</h1>
+          <p className="text-lg text-muted-foreground">{STRINGS.progressOverview}</p>
         </div>
-        <Button className="w-full sm:w-auto">
-          <Icons.play className="mr-2 h-4 w-4" />
+        <Button size="lg" className="shadow-lg">
+          <Icons.play className="mr-2 h-5 w-5" />
           {STRINGS.startStudySession}
         </Button>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat, index) => (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">{stat.title}</CardTitle>
-              <stat.icon className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-lg sm:text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">{stat.description}</p>
-            </CardContent>
+          <Card key={index} className="flex flex-col justify-between p-6">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
+              <stat.icon className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <div className="mt-2">
+              <p className="text-3xl font-bold">{stat.value}</p>
+              <p className="text-sm text-muted-foreground">{stat.description}</p>
+            </div>
           </Card>
         ))}
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
-        {/* Left Column */}
-        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-          <ExamCountdown />
+      <div className="grid gap-6 lg:grid-cols-5">
+        <div className="lg:col-span-3 space-y-6">
           <PerformanceChart />
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-4 sm:space-y-6">
-          <UploadQuestionPaper />
-          <StudyStreakCard currentStreak={streak.current} longestStreak={streak.longest} />
           <RecentActivity activities={activities} />
+        </div>
+        <div className="lg:col-span-2 space-y-6">
+          <ExamCountdown />
+          <StudyStreakCard currentStreak={streak.current} longestStreak={streak.longest} />
+          <UploadQuestionPaper />
         </div>
       </div>
     </div>
-  )
+  );
 }
