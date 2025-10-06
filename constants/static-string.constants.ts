@@ -213,9 +213,8 @@ export const DASHBOARD_SIDEBAR_STRINGS = {
 
 export const DASHBOARD_SIDEBAR_NAVIGATION = [
   { name: "Overview", href: "/", iconName: "barChart" },
-  { name: "Question Papers", href: "/question-papers", iconName: "upload" },
+  { name: "Test Papers", href: "/test-papers", iconName: "bookOpen" },
   { name: "Mock Tests", href: "/tests", iconName: "fileText" },
-  { name: "Study Mode", href: "/study", iconName: "bookOpen" },
   { name: "Flashcards", href: "/flashcards", iconName: "brain" },
   { name: "Analytics", href: "/analytics", iconName: "trendingUp" },
   { name: "Goals", href: "/goals", iconName: "target" },

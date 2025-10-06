@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI, Part } from "@google/generative-ai"
 import { fileToGenerativePart } from "./utils"
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string)
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY as string)
 
 /**
  * Process a question paper buffer with Gemini AI and return parsed questions

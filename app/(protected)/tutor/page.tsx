@@ -1,10 +1,10 @@
 import { DashboardLayout } from "../_components/dashboard-layout"
-import { AITutor } from "./components/ai-tutor"
+import { AITutorComponent } from "./_components/ai-tutor"
 
 export default function TutorPage() {
   return (
     <DashboardLayout>
-      <AITutor />
+      <AITutorComponent />
     </DashboardLayout>
   )
 }
