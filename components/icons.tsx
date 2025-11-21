@@ -24,6 +24,10 @@ import {
   Menu,
   LogOut,
   ArrowLeft,
+  Pin,
+  Settings,
+  HelpCircle,
+  ChevronRight,
 } from "lucide-react"
 
 export const Icons = {
@@ -53,7 +57,7 @@ export const Icons = {
   ),
   mail: Mail,
   user: User,
-  logout: LogOut, 
+  logout: LogOut,
   bookOpen: BookOpen,
   target: Target,
   calendar: Calendar,
@@ -72,4 +76,8 @@ export const Icons = {
   zap: Zap,
   menu: Menu,
   arrowLeft: ArrowLeft,
+  pin: Pin,
+  settings: Settings,
+  helpCircle: HelpCircle,
+  chevronRight: ChevronRight,
 }

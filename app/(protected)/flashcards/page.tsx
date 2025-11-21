@@ -1,4 +1,3 @@
-import { DashboardLayout } from "../_components/dashboard-layout"
 import { FlashcardsOverview } from "./components/flashcards-overview"
 
 const mockDecks = [
@@ -39,8 +38,6 @@ const mockDecks = [
 
 export default function FlashcardsPage() {
   return (
-    <DashboardLayout>
-      <FlashcardsOverview decks={mockDecks} />
-    </DashboardLayout>
+    <FlashcardsOverview decks={mockDecks} />
   )
 }

@@ -1,4 +1,3 @@
-import { DashboardLayout } from "../_components/dashboard-layout"
 import { TestsOverview } from "./components/tests-overview"
 
 const mockTests = [
@@ -42,8 +41,6 @@ const mockTests = [
 
 export default function TestsPage() {
   return (
-    <DashboardLayout>
-      <TestsOverview tests={mockTests} />
-    </DashboardLayout>
+    <TestsOverview tests={mockTests} />
   )
 }

@@ -65,7 +65,7 @@ export function UploadPaperDialog({ open, onOpenChange }: UploadPaperDialogProps
       description="Upload a question paper and its answer sheet to begin processing."
     >
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 p-1">
           <FileUploadFormField control={form.control} name="questionFile" label="Question Paper" icon="upload" />
           <FileUploadFormField control={form.control} name="answerFile" label="Answer Sheet (Optional)" icon="file" optionalText="Optional" />
           <TextInputFormField control={form.control} name="title" label="Title" placeholder="Enter paper title" />

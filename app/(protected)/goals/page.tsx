@@ -1,4 +1,3 @@
-import { DashboardLayout } from "../_components/dashboard-layout"
 import { GoalsOverview } from "./components/goals-overview"
 
 const mockGoals = [
@@ -54,8 +53,6 @@ const mockGoals = [
 
 export default function GoalsPage() {
   return (
-    <DashboardLayout>
-      <GoalsOverview goals={mockGoals} />
-    </DashboardLayout>
+    <GoalsOverview goals={mockGoals} />
   )
 }
