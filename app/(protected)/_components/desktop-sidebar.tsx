@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useRouter } from "next/navigation"
 import {
   BookOpen, BarChart, FileText, Brain, TrendingUp, Target,
   Calendar, Zap, Settings, HelpCircle, LogOut, Moon, Sun,
@@ -32,6 +33,7 @@ export const DesktopSidebar = () => {
   const [hovering, setHovering] = useState(false)
   const [pathname, setPathname] = useState("/")
   const [darkMode, setDarkMode] = useState(false)
+  const router = useRouter()
 
   const expandedW = 256
   const collapsedW = 72
@@ -43,10 +45,11 @@ export const DesktopSidebar = () => {
 
   const handleLogout = () => {
     console.log("Logout clicked")
+    // Add actual logout logic here
   }
 
   return (
-    <div className="hidden md:flex h-screen bg-background dark:bg-background">
+    <div className="hidden md:flex fixed left-0 top-0 h-screen bg-background dark:bg-background z-50">
       <motion.aside
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
@@ -102,6 +105,7 @@ export const DesktopSidebar = () => {
               expanded={shouldExpand}
               active={pathname === item.href}
               delay={idx * 0.03}
+              onNavigate={(href: string) => router.push(href)}
             />
           ))}
         </nav>
@@ -144,14 +148,14 @@ export const DesktopSidebar = () => {
   )
 }
 
-const SidebarNavItem = ({ item, expanded, active, delay }: any) => {
+const SidebarNavItem = ({ item, expanded, active, delay, onNavigate }: any) => {
   const [open, setOpen] = useState(false)
   const Icon = item.icon
 
   return (
     <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }} className="mb-1">
       <button
-        onClick={() => (item.subItems ? setOpen(!open) : console.log("Navigate to", item.href))}
+        onClick={() => (item.subItems ? setOpen(!open) : onNavigate(item.href))}
         className={`group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all relative overflow-hidden ${
           active
             ? "bg-primary/15 text-primary dark:text-primary shadow-sm"
@@ -194,7 +198,7 @@ const SidebarNavItem = ({ item, expanded, active, delay }: any) => {
               {item.subItems.map((s: any) => (
                 <button
                   key={s.name}
-                  onClick={() => console.log("Navigate to", s.href)}
+                  onClick={() => onNavigate(s.href)}
                   className="block w-full text-left px-3 py-1.5 rounded-md text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 transition-all"
                 >
                   {s.name}
