@@ -1,80 +1,130 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useChat } from "@ai-sdk/react";
+import { useChat, type Message } from "@ai-sdk/react";
 import ReactMarkdown from "react-markdown";
-import { DefaultChatTransport } from "ai";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Icons } from "@/components/icons";
 import { QUICK_ACTIONS } from "@/app/(protected)/tutor/_constants";
 import { AiCapabilitiesComponent, ChatHistoryComponent, HeaderComponent } from "@/app/(protected)/tutor/_components";
 
-// ChatStatus = 'submitted' | 'streaming' | 'ready' | 'error'
-type messageRole = "system" | "user" | "assistant";
+interface Conversation {
+  id: string;
+  title: string;
+  created_at: string;
+}
 
 export const AITutorComponent = () => {
-  const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/tutor",
-    }),
-    messages: [
-      {
-        id: "init",
-        role: "assistant" as messageRole,
-        parts: [
-          {
-            type: "text",
-            text: "Hello! I'm your AI tutor. I can help with questions, explanations, and study guidance. What would you like to learn today?",
-          },
-        ],
-      },
-    ],
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+
+  const { messages, append, setMessages, isLoading } = useChat({
+    api: "/api/tutor",
   });
 
   const [inputValue, setInputValue] = useState("");
   const [showSidebar, setShowSidebar] = useState(false);
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [showQuickActions, setShowQuickActions] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Fetch all conversations on mount
+  useEffect(() => {
+    const fetchConversations = async () => {
+      const response = await fetch('/api/conversations');
+      if (response.ok) {
+        const data = await response.json();
+        setConversations(data);
+      }
+    };
+    fetchConversations();
+  }, []);
+
+  // Fetch messages for the selected conversation
+  useEffect(() => {
+    if (selectedConversation) {
+      const fetchMessages = async () => {
+        const response = await fetch(`/api/conversations/${selectedConversation.id}/messages`);
+        if (response.ok) {
+          const data = await response.json();
+          const formattedMessages: Message[] = data.map((msg: any) => ({
+            id: msg.id,
+            role: msg.role as 'user' | 'assistant',
+            content: msg.content,
+          }));
+          setMessages(formattedMessages);
+        }
+      };
+      fetchMessages();
+    } else {
+      setMessages([
+        {
+          id: "init",
+          role: "assistant",
+          content: "Hello! I'm your AI tutor. I can help with questions, explanations, and study guidance. What would you like to learn today?",
+        },
+      ]);
+    }
+  }, [selectedConversation, setMessages]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
 
-    sendMessage({ text: inputValue });
+    const messageContent = inputValue;
     setInputValue("");
+
+    let currentConversationId = selectedConversation?.id;
+
+    if (!currentConversationId) {
+      try {
+        const response = await fetch('/api/conversations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: messageContent.slice(0, 30) + '...' }),
+        });
+        if (response.ok) {
+          const newConversation = await response.json();
+          setConversations(prev => [newConversation, ...prev]);
+          setSelectedConversation(newConversation);
+          currentConversationId = newConversation.id;
+
+          await append({ content: messageContent, role: 'user' }, { options: { body: { conversationId: currentConversationId } } });
+        } else {
+          console.error("Failed to create conversation");
+          return;
+        }
+      } catch (error) {
+        console.error("Error creating conversation:", error);
+        return;
+      }
+    } else {
+      await append({ content: messageContent, role: 'user' }, { options: { body: { conversationId: currentConversationId } } });
+    }
   };
 
   const handleQuickAction = (action: string) => setInputValue(action);
 
-  const isTyping = status === "streaming";
-
   // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping]);
+  }, [messages, isLoading]);
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
       <HeaderComponent showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
-
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-4">
-        {/* Sidebar */}
         <ChatHistoryComponent
           showSidebar={showSidebar}
           setShowSidebar={setShowSidebar}
+          conversations={conversations}
           selectedConversation={selectedConversation}
           setSelectedConversation={setSelectedConversation}
         />
-
-        {/* Main Chat Area */}
         <div className="lg:col-span-3 relative">
           <Card className="flex flex-col h-[500px] sm:h-[600px] pt-3 pb-2 md:pt-3 md:pb-3 gap-2 md:gap-2">
             <CardHeader className="flex-shrink-0 flex items-center justify-between">
@@ -96,8 +146,6 @@ export const AITutorComponent = () => {
                 </Button>
               </div>
             </CardHeader>
-
-            {/* Messages - Scrollable */}
             <CardContent className="flex-1 flex flex-col px-3 md:px-4 py-2 md:py-2 overflow-hidden min-h-0">
               <div className="flex-1 overflow-y-auto pr-2 md:pr-4">
                 <div className="space-y-3 sm:space-y-4">
@@ -120,15 +168,13 @@ export const AITutorComponent = () => {
                         >
                           <div className="text-xs sm:text-sm leading-relaxed">
                             <ReactMarkdown>
-                              {message.parts.map((p) => (p.type === "text" ? p.text : "")).join("")}
+                              {message.content}
                             </ReactMarkdown>
                           </div>
                         </div>
                       </motion.div>
                     ))}
-
-                    {/* Typing Indicator */}
-                    {isTyping && (
+                    {isLoading && (
                       <motion.div
                         key="typing-indicator"
                         initial={{ opacity: 0 }}
@@ -152,12 +198,9 @@ export const AITutorComponent = () => {
                       </motion.div>
                     )}
                   </AnimatePresence>
-
                   <div ref={messagesEndRef} />
                 </div>
               </div>
-
-              {/* Quick Actions */}
               <AnimatePresence>
                 {showQuickActions && (
                   <motion.div
@@ -196,8 +239,6 @@ export const AITutorComponent = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-
-              {/* Toggle Quick Actions */}
               {!showQuickActions && (
                 <Button
                   variant="outline"
@@ -209,8 +250,6 @@ export const AITutorComponent = () => {
                   Quick Actions
                 </Button>
               )}
-
-              {/* Input */}
               <form className="flex gap-2 flex-shrink-0" onSubmit={handleSubmit}>
                 <Input
                   value={inputValue}
@@ -218,7 +257,7 @@ export const AITutorComponent = () => {
                   placeholder="Ask me anything..."
                   className="flex-1 text-sm sm:text-base h-9 sm:h-10"
                 />
-                <Button type="submit" size="icon" className="h-9 w-9 sm:h-10 sm:w-10">
+                <Button type="submit" size="icon" className="h-9 w-9 sm:h-10 sm:w-10" disabled={isLoading}>
                   <Icons.play className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </form>
@@ -226,8 +265,6 @@ export const AITutorComponent = () => {
           </Card>
         </div>
       </div>
-
-      {/* AI Capabilities */}
       <AiCapabilitiesComponent />
     </div>
   );
