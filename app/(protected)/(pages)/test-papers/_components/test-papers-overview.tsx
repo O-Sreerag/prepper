@@ -1,46 +1,38 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState } from "react"
+import { ColumnDef } from "@tanstack/react-table"
 
+import { Icons } from "@/components/icons"
 import { Button } from "@/components/ui/button"
+import { DataTable } from "@/components/tables"
+import { Badge } from "@/components/ui/badge"
+
+import { trpc } from '@/app/_trpc/client'
 import { UploadPaperDialog } from "./upload-test-paper-dailog"
 import { QuestionReview } from "./test-papers-review"
-import { Icons } from "@/components/icons"
 import { TEST_PAPERS_OVERVIEW_STRINGS as STRINGS } from "@/constants"
-import { TestPaperType } from "@/app/(protected)/(pages)/test-papers/types"
-import { DataTable } from "@/components/tables"
-import { ColumnDef } from "@tanstack/react-table"
-import { Badge } from "@/components/ui/badge"
-// import { TestPaperType } from "./types"
+import { TestPaperGetAllType } from "@/lib/types"
 
-export function TestPapersOverview() {
+type Props = {
+  initialTestPapers: TestPaperGetAllType[]
+}
+
+export function TestPapersOverview({ initialTestPapers }: Props) {
   const [isUploadDialogOpen, setUploadDialogOpen] = useState(false)
-  const [testPapers, setTestPapers] = useState<TestPaperType[]>([])
-  const [selectedJob, setSelectedJob] = useState<TestPaperType | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [selectedJob, setSelectedJob] = useState<TestPaperGetAllType | null>(null)
 
-  const fetchTestPapers = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      const response = await fetch("/api/test-paper")
-      const result = await response.json()
-      if (!result.success) throw new Error(result.error || "Failed to fetch test papers.")
-      setTestPapers(result.data)
-      console.log(result.data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error occurred")
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
+  const {
+    data: testPapers = initialTestPapers,
+    isFetching,
+    error,
+    refetch,
+  } = trpc.testPaper.getAll.useQuery(undefined, {
+    initialData: initialTestPapers,
+    refetchOnMount: true,
+  })
 
-  useEffect(() => {
-    fetchTestPapers()
-    // const interval = setInterval(fetchTestPapers, 10000) // refresh every 10s
-    // return () => clearInterval(interval)
-  }, [fetchTestPapers])
+  const isLoading = isFetching && initialTestPapers.length === 0
 
   const handleProcessTestPaper = async (testPaperId: string) => {
     console.log("Processing test paper:", testPaperId)
@@ -48,7 +40,7 @@ export function TestPapersOverview() {
       const response = await fetch(`/api/test-paper/process-upload-files/${testPaperId}`, { method: "POST" })
       const result = await response.json()
       if (!result.success) throw new Error(result.error || "Failed to process test paper.")
-      fetchTestPapers()
+      await refetch()
     } catch (err) {
       alert(err instanceof Error ? err.message : "Unknown error during processing.")
     }
@@ -56,14 +48,6 @@ export function TestPapersOverview() {
 
   if (selectedJob) {
     return <QuestionReview testPaper={selectedJob} onBack={() => setSelectedJob(null)} />
-  }
-
-  const statusColors: Record<TestPaperType["status"], string> = {
-    queued: "bg-yellow-100 text-yellow-800",
-    processing: "bg-blue-100 text-blue-800",
-    review: "bg-purple-100 text-purple-800",
-    failed: "bg-red-100 text-red-800",
-    completed: "bg-green-100 text-green-800",
   }
 
   const testPaperColumns: ColumnDef<any>[] = [
@@ -172,7 +156,7 @@ export function TestPapersOverview() {
         {error && (
           <div className="border rounded-lg p-8 text-center bg-destructive/10 text-destructive">
             <h2 className="text-xl font-semibold">Error</h2>
-            <p className="mt-2">{error}</p>
+            <p className="mt-2">{error.message}</p>
           </div>
         )}
 

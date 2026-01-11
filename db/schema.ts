@@ -1,8 +1,6 @@
 import { pgTable, foreignKey, uuid, text, integer, timestamp, jsonb, real, boolean, unique, date, check, doublePrecision } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
-
-
 export const uploadFiles = pgTable("upload_files", {
 	uploadFileId: uuid("upload_file_id").defaultRandom().primaryKey().notNull(),
 	testPaperId: uuid("test_paper_id"),

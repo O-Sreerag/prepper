@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { TestPaperType } from "@/app/(protected)/(pages)/test-papers/types"
+import { TestPaperGetAllType } from "@/lib/types"
 
 // Based on the DB schema for parsed_questions
 type ParsedQuestion = {
@@ -20,7 +20,7 @@ type ParsedQuestion = {
 };
 
 interface QuestionReviewProps {
-  testPaper: TestPaperType;
+  testPaper: TestPaperGetAllType;
   onBack: () => void;
 }
 
@@ -33,7 +33,7 @@ export function QuestionReview({ testPaper, onBack }: QuestionReviewProps) {
     async function fetchParsedQuestions() {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/uploads/${testPaper.test_paper_id}/parsed`);
+        const response = await fetch(`/api/uploads/${testPaper.testPaperId}/parsed`);
         const result = await response.json();
         if (!result.success) {
           throw new Error(result.error || "Failed to fetch parsed questions.");
@@ -47,7 +47,7 @@ export function QuestionReview({ testPaper, onBack }: QuestionReviewProps) {
       }
     }
     fetchParsedQuestions();
-  }, [testPaper.test_paper_id]);
+  }, [testPaper.testPaperId]);
 
   return (
     <div className="container mx-auto py-8">
