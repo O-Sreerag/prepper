@@ -11,8 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Icons } from "@/components/icons";
-import { QUICK_ACTIONS } from "@/app/(protected)/tutor/_constants";
-import { AiCapabilitiesComponent, ChatHistoryComponent, HeaderComponent } from "@/app/(protected)/tutor/_components";
+import { QUICK_ACTIONS } from "@/app/(protected)/(pages)/tutor/_constants";
+import { AiCapabilitiesComponent, ChatHistoryComponent, HeaderComponent } from "@/app/(protected)/(pages)/tutor/_components";
 
 // ChatStatus = 'submitted' | 'streaming' | 'ready' | 'error'
 type messageRole = "system" | "user" | "assistant";

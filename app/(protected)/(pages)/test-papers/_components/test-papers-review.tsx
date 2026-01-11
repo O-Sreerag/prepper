@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { TestPaperType } from "@/app/(protected)/test-papers/types"
+import { TestPaperType } from "@/app/(protected)/(pages)/test-papers/types"
 
 // Based on the DB schema for parsed_questions
 type ParsedQuestion = {

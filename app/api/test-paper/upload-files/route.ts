@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 
 import { createClient } from "@/services/supabase/server";
-import { uploadSchema } from "@/app/(protected)/test-papers/_schemas";
+import { uploadSchema } from "@/app/(protected)/(pages)/test-papers/_schemas";
 import { formDataToObject } from "@/lib/utils";
 import { SUPABASE_DB_BUCKET_CONSTANTS, SUPABASE_DB_TABLES_CONSTANTS } from "@/constants";
 

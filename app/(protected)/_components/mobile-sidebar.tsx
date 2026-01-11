@@ -5,25 +5,7 @@ import { Icons } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useRouter } from "next/navigation"
 import { AuthService } from "@/services/api/auth.service"
-
-const NAV = [
-  { name: "Overview", href: "/", icon: "barChart" },
-  {
-    name: "Test Papers",
-    href: "/test-papers",
-    icon: "bookOpen",
-    subItems: [
-      { name: "All Papers", href: "/test-papers" },
-      { name: "Create Paper", href: "/test-papers/create" },
-    ],
-  },
-  { name: "Mock Tests", href: "/tests", icon: "fileText" },
-  { name: "Flashcards", href: "/flashcards", icon: "brain" },
-  { name: "Analytics", href: "/analytics", icon: "trendingUp" },
-  { name: "Goals", href: "/goals", icon: "target" },
-  { name: "Planner", href: "/planner", icon: "calendar" },
-  { name: "AI Tutor", href: "/tutor", icon: "zap" },
-]
+import { SIDEBAR_ITEMS } from "@/config"
 
 interface MobileSidebarProps {
   onClose: () => void
@@ -52,8 +34,8 @@ export const MobileSidebar = ({ onClose }: MobileSidebarProps) => {
       </div>
 
       <nav className="flex-1 overflow-auto p-2">
-        {NAV.map((item) => {
-          const Icon = Icons[item.icon as keyof typeof Icons] || Icons.bookOpen
+        {SIDEBAR_ITEMS.map((item) => {
+          const Icon = item.icon
           return (
             <div key={item.name} className="mb-1">
               <a 

@@ -2,46 +2,42 @@
 
 import React, { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import {
-  BookOpen, BarChart, FileText, Brain, TrendingUp, Target,
-  Calendar, Zap, Settings, HelpCircle, LogOut, Moon, Sun,
+  BookOpen, Settings, HelpCircle, LogOut, Moon, Sun,
   ChevronRight, Menu
 } from "lucide-react"
 
-const NAV = [
-  { name: "Overview", href: "/", icon: BarChart },
-  {
-    name: "Test Papers",
-    href: "/test-papers",
-    icon: BookOpen,
-    subItems: [
-      { name: "All Papers", href: "/test-papers" },
-      { name: "Create Paper", href: "/test-papers/create" },
-    ],
-  },
-  { name: "Mock Tests", href: "/tests", icon: FileText },
-  { name: "Flashcards", href: "/flashcards", icon: Brain },
-  { name: "Analytics", href: "/analytics", icon: TrendingUp },
-  { name: "Goals", href: "/goals", icon: Target },
-  { name: "Planner", href: "/planner", icon: Calendar },
-  { name: "AI Tutor", href: "/tutor", icon: Zap },
-]
+import { SIDEBAR_ITEMS } from "@/config"
+
+export const SIDEBAR_WIDTH = {
+  expanded: 256,
+  collapsed: 72,
+}
 
 export const DesktopSidebar = () => {
   const [collapsed, setCollapsed] = useState(false)
   const [hovering, setHovering] = useState(false)
-  const [pathname, setPathname] = useState("/")
   const [darkMode, setDarkMode] = useState(false)
+  const pathname = usePathname()
   const router = useRouter()
 
-  const expandedW = 256
-  const collapsedW = 72
   const shouldExpand = !collapsed || hovering
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode)
   }, [darkMode])
+
+  useEffect(() => {
+    const width = shouldExpand
+      ? SIDEBAR_WIDTH.expanded
+      : SIDEBAR_WIDTH.collapsed
+
+    document.documentElement.style.setProperty(
+      "--sidebar-width",
+      `${width}px`
+    )
+  }, [shouldExpand])
 
   const handleLogout = () => {
     console.log("Logout clicked")
@@ -53,7 +49,7 @@ export const DesktopSidebar = () => {
       <motion.aside
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
-        animate={{ width: shouldExpand ? expandedW : collapsedW }}
+        animate={{ width: shouldExpand ? SIDEBAR_WIDTH.expanded : SIDEBAR_WIDTH.collapsed }}
         initial={false}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className="relative flex flex-col bg-card dark:bg-card border-r border-border dark:border-border overflow-hidden shadow-sleek"
@@ -98,12 +94,13 @@ export const DesktopSidebar = () => {
 
         {/* Navigation */}
         <nav className="flex-1 overflow-auto py-4 px-2 custom-scrollbar">
-          {NAV.map((item, idx) => (
+          {SIDEBAR_ITEMS.map((item, idx) => (
             <SidebarNavItem
               key={item.name}
               item={item}
               expanded={shouldExpand}
-              active={pathname === item.href}
+              active={pathname === item.href || pathname.startsWith(item.href + "/")}
+              pathname={pathname}
               delay={idx * 0.03}
               onNavigate={(href: string) => router.push(href)}
             />
@@ -148,7 +145,7 @@ export const DesktopSidebar = () => {
   )
 }
 
-const SidebarNavItem = ({ item, expanded, active, delay, onNavigate }: any) => {
+const SidebarNavItem = ({ item, expanded, active, delay, onNavigate, pathname }: any) => {
   const [open, setOpen] = useState(false)
   const Icon = item.icon
 
@@ -156,11 +153,10 @@ const SidebarNavItem = ({ item, expanded, active, delay, onNavigate }: any) => {
     <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }} className="mb-1">
       <button
         onClick={() => (item.subItems ? setOpen(!open) : onNavigate(item.href))}
-        className={`group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all relative overflow-hidden ${
-          active
-            ? "bg-primary/15 text-primary dark:text-primary shadow-sm"
-            : "hover:bg-accent/10 text-foreground"
-        }`}
+        className={`group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all relative overflow-hidden ${active
+          ? "bg-primary text-background shadow-sm"
+          : "hover:bg-accent text-foreground"
+          }`}
       >
         <Icon className="h-5 w-5 flex-shrink-0 relative z-10" />
         <AnimatePresence>
@@ -199,7 +195,11 @@ const SidebarNavItem = ({ item, expanded, active, delay, onNavigate }: any) => {
                 <button
                   key={s.name}
                   onClick={() => onNavigate(s.href)}
-                  className="block w-full text-left px-3 py-1.5 rounded-md text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 transition-all"
+                  className={`block w-full text-left px-3 py-1.5 rounded-md text-sm transition-all 
+                    ${pathname === s.href || pathname.startsWith(s.href + "/")
+                      ? "text-primary bg-accent"
+                      : "text-foreground/70 hover:text-primary hover:bg-accent"
+                    }`}
                 >
                   {s.name}
                 </button>
@@ -216,7 +216,7 @@ const SidebarButton = ({ icon: Icon, label, expanded, onClick }: any) => {
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/10 transition-all group"
+      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-transparent hover:bg-accent transition-all group"
     >
       <Icon className="h-4 w-4 text-foreground flex-shrink-0" />
       <AnimatePresence>

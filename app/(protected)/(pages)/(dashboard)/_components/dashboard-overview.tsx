@@ -3,11 +3,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
-import { StudyStreakCard } from "@/app/(protected)/(dashboard)/_components/study-streak-card"
-import { PerformanceChart } from "@/app/(protected)/(dashboard)/_components/performance-chart"
-import { RecentActivity } from "@/app/(protected)/(dashboard)/_components/recent-activity"
-import { ExamCountdown } from "@/app/(protected)/(dashboard)/_components/exam-countdown"
-import { UploadQuestionPaper } from "@/app/(protected)/(dashboard)/_components/upload-question-paper"
+import { StudyStreakCard } from "@/app/(protected)/(pages)/(dashboard)/_components/study-streak-card"
+import { PerformanceChart } from "@/app/(protected)/(pages)/(dashboard)/_components/performance-chart"
+import { RecentActivity } from "@/app/(protected)/(pages)/(dashboard)/_components/recent-activity"
+import { ExamCountdown } from "@/app/(protected)/(pages)/(dashboard)/_components/exam-countdown"
+import { UploadQuestionPaper } from "@/app/(protected)/(pages)/(dashboard)/_components/upload-question-paper"
 import { DASHBOARD_STRINGS as STRINGS } from "@/constants"
 
 const activities = [

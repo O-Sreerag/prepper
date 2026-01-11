@@ -8,8 +8,8 @@ import { Form } from "@/components/ui/form";
 import { GenericDialog } from "@/components/dailogs/generic";
 import { TextInputFormField, TextAreaFormField, SelectFormField, FileUploadFormField } from "@/components/form/fields";
 import { ToastVariant, toastWithTimeout } from "@/hooks/use-toast";
-import { UploadPaperInput, UploadPaperSchema } from "@/app/(protected)/test-papers/_schemas";
-import { TEST_PAPER_SUBJECT_OPTIONS, TEST_PAPER_DIFFICULTY_OPTIONS } from "@/app/(protected)/test-papers/_constants";
+import { UploadPaperInput, UploadPaperSchema } from "@/app/(protected)/(pages)/test-papers/_schemas";
+import { TEST_PAPER_SUBJECT_OPTIONS, TEST_PAPER_DIFFICULTY_OPTIONS } from "@/app/(protected)/(pages)/test-papers/_constants";
 import { showErrorMessage } from "@/lib/utils";
 
 interface UploadPaperDialogProps {

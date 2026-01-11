@@ -7,7 +7,7 @@ import { UploadPaperDialog } from "./upload-test-paper-dailog"
 import { QuestionReview } from "./test-papers-review"
 import { Icons } from "@/components/icons"
 import { TEST_PAPERS_OVERVIEW_STRINGS as STRINGS } from "@/constants"
-import { TestPaperType } from "@/app/(protected)/test-papers/types"
+import { TestPaperType } from "@/app/(protected)/(pages)/test-papers/types"
 
 export function TestPapersOverview() {
   const [isUploadDialogOpen, setUploadDialogOpen] = useState(false)
