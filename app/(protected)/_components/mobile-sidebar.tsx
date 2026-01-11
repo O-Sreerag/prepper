@@ -5,7 +5,7 @@ import { Icons } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useRouter } from "next/navigation"
 import { AuthService } from "@/services/api/auth.service"
-import { SIDEBAR_ITEMS } from "@/config"
+import { ISidebarItem, SIDEBAR_ITEMS } from "@/config"
 
 interface MobileSidebarProps {
   onClose: () => void
@@ -34,7 +34,7 @@ export const MobileSidebar = ({ onClose }: MobileSidebarProps) => {
       </div>
 
       <nav className="flex-1 overflow-auto p-2">
-        {SIDEBAR_ITEMS.map((item) => {
+        {SIDEBAR_ITEMS.map((item: ISidebarItem) => {
           const Icon = item.icon
           return (
             <div key={item.name} className="mb-1">

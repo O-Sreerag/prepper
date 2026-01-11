@@ -8,7 +8,9 @@ import {
   ChevronRight, Menu
 } from "lucide-react"
 
-import { SIDEBAR_ITEMS } from "@/config"
+import { ISidebarItem, SIDEBAR_ITEMS } from "@/config"
+import { useTheme } from "next-themes"
+
 
 export const SIDEBAR_WIDTH = {
   expanded: 256,
@@ -16,17 +18,13 @@ export const SIDEBAR_WIDTH = {
 }
 
 export const DesktopSidebar = () => {
+  const { theme, setTheme } = useTheme()
   const [collapsed, setCollapsed] = useState(false)
   const [hovering, setHovering] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
 
   const shouldExpand = !collapsed || hovering
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", darkMode)
-  }, [darkMode])
 
   useEffect(() => {
     const width = shouldExpand
@@ -115,14 +113,11 @@ export const DesktopSidebar = () => {
 
           <div className="pt-2 border-t border-border/40 dark:border-border/40">
             <button
-              onClick={() => setDarkMode(!darkMode)}
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/10 transition-all group"
             >
-              {darkMode ? (
-                <Sun className="h-4 w-4 text-accent" />
-              ) : (
-                <Moon className="h-4 w-4 text-primary" />
-              )}
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
               <AnimatePresence>
                 {shouldExpand && (
                   <motion.span
@@ -131,21 +126,19 @@ export const DesktopSidebar = () => {
                     exit={{ opacity: 0 }}
                     className="text-sm text-foreground font-medium"
                   >
-                    {darkMode ? "Light" : "Dark"} Mode
+                    {theme === "dark" ? "Light" : "Dark"} Mode
                   </motion.span>
                 )}
               </AnimatePresence>
             </button>
           </div>
         </div>
-
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary opacity-70" />
       </motion.aside>
     </div>
   )
 }
 
-const SidebarNavItem = ({ item, expanded, active, delay, onNavigate, pathname }: any) => {
+const SidebarNavItem = ({ item, expanded, active, delay, onNavigate, pathname }: { item: ISidebarItem, expanded: boolean, active: boolean, delay: number, onNavigate: (href: string) => void, pathname: string }) => {
   const [open, setOpen] = useState(false)
   const Icon = item.icon
 
@@ -177,8 +170,6 @@ const SidebarNavItem = ({ item, expanded, active, delay, onNavigate, pathname }:
             <ChevronRight className="h-4 w-4" />
           </motion.div>
         )}
-
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-accent/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
       </button>
 
       <AnimatePresence>

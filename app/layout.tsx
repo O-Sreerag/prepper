@@ -4,7 +4,7 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import { Analytics } from '@vercel/analytics/next'
 
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "next-themes"
 import { Toaster } from "@/components/ui/toaster"
 import ReactQueryProvider from "./react-query-provider";
 import '@/styles/globals.css'
@@ -29,11 +29,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Suspense fallback={<div className="text-sm flex items-center justify-center h-screen">Loading Merit-HRMS...</div>}>
+          <Suspense fallback={<div className="text-sm flex items-center justify-center h-screen bg-background text-foreground">Loading Merit-HRMS...</div>}>
             <ReactQueryProvider>
               {children}
             </ReactQueryProvider>
-          </Suspense> 
+          </Suspense>
           <Toaster />
           <Analytics />
         </ThemeProvider>

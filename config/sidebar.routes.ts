@@ -73,3 +73,11 @@ export const SIDEBAR_ITEMS = [
     icon: Zap,
   },
 ]
+
+export interface ISidebarItem {
+  id: string;
+  name: string;
+  href: string;
+  icon: any;
+  subItems?: ISidebarItem[];
+}
