@@ -28,6 +28,11 @@ import {
   Settings,
   HelpCircle,
   ChevronRight,
+  Eye,
+  Download,
+  Share,
+  File,
+  ExternalLink,
 } from "lucide-react"
 
 export const Icons = {
@@ -80,4 +85,9 @@ export const Icons = {
   settings: Settings,
   helpCircle: HelpCircle,
   chevronRight: ChevronRight,
+  eye: Eye,
+  download: Download,
+  share: Share,
+  file: File,
+  externalLink: ExternalLink,
 }

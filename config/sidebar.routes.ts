@@ -23,18 +23,18 @@ export const SIDEBAR_ITEMS = [
     name: "Test Papers",
     href: ROUTES.TEST_PAPERS.ROOT,
     icon: BookOpen,
-    subItems: [
-      {
-        id: "test-papers-all",
-        name: "All Papers",
-        href: ROUTES.TEST_PAPERS.ROOT,
-      },
-      {
-        id: "test-papers-create",
-        name: "Create Paper",
-        href: ROUTES.TEST_PAPERS.CREATE,
-      },
-    ],
+    // subItems: [
+    //   {
+    //     id: "test-papers-all",
+    //     name: "All Papers",
+    //     href: ROUTES.TEST_PAPERS.ROOT,
+    //   },
+    //   {
+    //     id: "test-papers-create",
+    //     name: "Create Paper",
+    //     href: ROUTES.TEST_PAPERS.CREATE,
+    //   },
+    // ],
   },
   {
     id: "mock-tests",

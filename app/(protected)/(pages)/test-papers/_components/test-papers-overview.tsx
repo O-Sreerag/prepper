@@ -8,6 +8,10 @@ import { QuestionReview } from "./test-papers-review"
 import { Icons } from "@/components/icons"
 import { TEST_PAPERS_OVERVIEW_STRINGS as STRINGS } from "@/constants"
 import { TestPaperType } from "@/app/(protected)/(pages)/test-papers/types"
+import { DataTable } from "@/components/tables"
+import { ColumnDef } from "@tanstack/react-table"
+import { Badge } from "@/components/ui/badge"
+// import { TestPaperType } from "./types"
 
 export function TestPapersOverview() {
   const [isUploadDialogOpen, setUploadDialogOpen] = useState(false)
@@ -24,6 +28,7 @@ export function TestPapersOverview() {
       const result = await response.json()
       if (!result.success) throw new Error(result.error || "Failed to fetch test papers.")
       setTestPapers(result.data)
+      console.log(result.data)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error occurred")
     } finally {
@@ -35,7 +40,7 @@ export function TestPapersOverview() {
     fetchTestPapers()
     // const interval = setInterval(fetchTestPapers, 10000) // refresh every 10s
     // return () => clearInterval(interval)
-  }, [fetchTestPapers]) 
+  }, [fetchTestPapers])
 
   const handleProcessTestPaper = async (testPaperId: string) => {
     console.log("Processing test paper:", testPaperId)
@@ -60,6 +65,87 @@ export function TestPapersOverview() {
     failed: "bg-red-100 text-red-800",
     completed: "bg-green-100 text-green-800",
   }
+
+  const testPaperColumns: ColumnDef<any>[] = [
+    {
+      accessorKey: "title",
+      header: "Title",
+      cell: ({ row }) => (
+        <div>
+          <p className="font-medium">{row.original.title}</p>
+          <p className="text-xs text-muted-foreground capitalize">
+            {row.original.subject}
+          </p>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "difficulty",
+      header: "Difficulty",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="capitalize">
+          {row.original.difficulty}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.original.status
+        const map: Record<string, string> = {
+          queued: "bg-yellow-100 text-yellow-800",
+          processing: "bg-blue-100 text-blue-800",
+          review: "bg-purple-100 text-purple-800",
+          failed: "bg-red-100 text-red-800",
+          completed: "bg-green-100 text-green-800",
+        }
+
+        return (
+          <span className={`px-2 py-1 rounded-md text-xs font-medium ${map[status]}`}>
+            {status}
+          </span>
+        )
+      },
+    },
+    {
+      accessorKey: "created_at",
+      header: "Uploaded",
+      cell: ({ row }) =>
+        new Date(row.original.created_at).toLocaleDateString(),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const paper = row.original
+
+        return (
+          <div className="flex gap-2">
+            {["queued", "failed"].includes(paper.status) && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleProcessTestPaper(paper.test_paper_id)}
+                disabled={paper.status === "processing"}
+              >
+                {paper.status === "failed" ? "Retry" : "Process"}
+              </Button>
+            )}
+
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={paper.status !== "review"}
+              onClick={() => setSelectedJob(paper)}
+            >
+              Review
+            </Button>
+          </div>
+        )
+      },
+    },
+  ]
 
   return (
     <>
@@ -90,53 +176,12 @@ export function TestPapersOverview() {
           </div>
         )}
 
-        {!isLoading && !error && testPapers.length === 0 && (
-          <div className="border rounded-lg p-8 text-center">
-            <h2 className="text-xl font-semibold">{STRINGS.noUploadJobsFound}</h2>
-            <p className="text-muted-foreground mt-2">{STRINGS.getStartedDescription}</p>
-          </div>
-        )}
-
-        {!isLoading && !error && testPapers.length > 0 && (
-          <div className="space-y-4">
-            {testPapers.map((testPaper) => (
-              <div key={testPaper.test_paper_id} className="border rounded-lg p-4 flex justify-between items-center">
-                <div>
-                  <h3 className="font-semibold">{testPaper.title}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {testPaper.subject} - {STRINGS.uploadedOn} {new Date(testPaper.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span
-                    className={`text-sm font-medium capitalize px-2 py-1 rounded-md ${statusColors[testPaper.status]}`}
-                  >
-                    {testPaper.status}
-                  </span>
-
-                  {["queued", "failed"].includes(testPaper.status) && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleProcessTestPaper(testPaper.test_paper_id)}
-                      disabled={testPaper.status === "processing"}
-                    >
-                      {testPaper.status === "failed" ? "Retry Processing" : "Process"}
-                    </Button>
-                  )}
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedJob(testPaper)}
-                    disabled={testPaper.status !== "review"}
-                  >
-                    Review
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+        {!isLoading && !error && (
+          <DataTable
+            data={testPapers}
+            columns={testPaperColumns}
+            pageSize={8}
+          />
         )}
       </div>
     </>
