@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Icons } from "@/components/icons"
-import { TestPaperDetailsType, ParsedQuestionType } from "../types/questions"
+import { TestPaperDetailsType, ParsedQuestionType } from "../_types/questions"
 import { SingleQuestionReview } from "./single-question-review"
 
 interface TestPaperDetailsProps {

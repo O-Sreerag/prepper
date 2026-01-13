@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { ColumnDef } from "@tanstack/react-table"
 
 import { Icons } from "@/components/icons"
@@ -11,18 +12,18 @@ import { Badge } from "@/components/ui/badge"
 import { trpc } from '@/app/_trpc/client'
 import { UploadPaperDialog } from "./upload-test-paper-dailog"
 import { QuestionReview } from "./test-papers-review"
-import { TestPaperView } from "./test-paper-view"
 import { TEST_PAPERS_OVERVIEW_STRINGS as STRINGS } from "@/constants"
 import { TestPaperGetAllType } from "@/lib/types"
+import { ROUTES } from "@/config"
 
 type Props = {
   initialTestPapers: TestPaperGetAllType[]
 }
 
-export function TestPapersOverview({ initialTestPapers }: Props) {
+export function TestPapersList({ initialTestPapers }: Props) {
+  const router = useRouter()
   const [isUploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [selectedJob, setSelectedJob] = useState<TestPaperGetAllType | null>(null)
-  const [selectedView, setSelectedView] = useState<TestPaperGetAllType | null>(null)
 
   const {
     data: testPapers = initialTestPapers,
@@ -62,11 +63,7 @@ export function TestPapersOverview({ initialTestPapers }: Props) {
     return <QuestionReview testPaper={selectedJob} onBack={() => setSelectedJob(null)} />
   }
 
-  if (selectedView) {
-    return <TestPaperView testPaper={selectedView} />
-  }
-
-  const testPaperColumns: ColumnDef<any>[] = [
+  const testPaperColumns: ColumnDef<TestPaperGetAllType, any>[] = [
     {
       accessorKey: "title",
       header: "Title",
@@ -112,7 +109,7 @@ export function TestPapersOverview({ initialTestPapers }: Props) {
       accessorKey: "createdAt",
       header: "Uploaded",
       cell: ({ row }) =>
-        new Date(row.original.createdAt).toLocaleDateString(),
+        new Date(row.original.createdAt || '').toLocaleDateString(),
     },
     {
       accessorKey: "uploadFiles",
@@ -151,15 +148,13 @@ export function TestPapersOverview({ initialTestPapers }: Props) {
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => {
-        const paper = row.original
-
+      cell: ({ row: { original: paper } }) => {
         return (
           <div className="flex gap-2">
             <Button
               size="sm"
               variant="outline"
-              onClick={() => setSelectedView(paper)}
+              onClick={() => router.push(ROUTES.TEST_PAPERS.VIEW(paper.testPaperId))}
             >
               <Icons.eye className="mr-2 h-4 w-4" />
               View

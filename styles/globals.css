@@ -116,3 +116,9 @@
   --sidebar-width: 256px;
   /* expanded by default */
 }
+
+.container {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+}

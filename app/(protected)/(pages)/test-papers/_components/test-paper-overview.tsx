@@ -1,6 +1,5 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -9,7 +8,7 @@ import { Progress } from "@/components/ui/progress"
 import { Icons } from "@/components/icons"
 import { TestPaperGetAllType } from "@/lib/types"
 
-interface TestPaperViewProps {
+interface TestPaperOverViewProps {
   testPaper: TestPaperGetAllType & { 
     uploadFiles?: any;
     parsed_questions?: any[];
@@ -17,7 +16,7 @@ interface TestPaperViewProps {
   }
 }
 
-export const TestPaperView = ({ testPaper }: TestPaperViewProps) => {
+export const TestPaperOverView = ({ testPaper }: TestPaperOverViewProps) => {
   const router = useRouter()
 
   const statusColors: Record<string, string> = {
@@ -44,18 +43,9 @@ export const TestPaperView = ({ testPaper }: TestPaperViewProps) => {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => router.back()}
-          className="bg-transparent"
-        >
-          <Icons.arrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
         <div className="flex-1">
           <h1 className="text-3xl font-bold">{testPaper.title}</h1>
           <p className="text-muted-foreground">{testPaper.description || 'No description available'}</p>

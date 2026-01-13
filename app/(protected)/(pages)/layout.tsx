@@ -1,10 +1,11 @@
 "use client"
 
 import React from "react"
-import { DesktopSidebar, DesktopNavbar } from "@/app/(protected)/_components"
+import { DesktopSidebar, DesktopNavbar, TopHeader } from "@/app/(protected)/_components"
+import { HeaderProvider } from "@/app/(protected)/_contexts"
 
 interface LayoutProps {
-    children: React.ReactNode
+  children: React.ReactNode
 }
 
 export default function Layout({ children }: LayoutProps) {
@@ -19,9 +20,13 @@ export default function Layout({ children }: LayoutProps) {
         style={{ marginLeft: "var(--sidebar-width)" }}
       >
         <DesktopNavbar />
-        <main className="flex-1 p-3 sm:p-4 lg:p-6 pb-safe">
-          {children}
-        </main>
+
+        <HeaderProvider>
+          <TopHeader />
+          <main className="flex-1 p-3 sm:p-4 lg:p-6 pb-safe">
+            {children}
+          </main>
+        </HeaderProvider>
       </div>
     </div>
   )

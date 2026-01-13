@@ -1,5 +1,5 @@
 import { appRouter } from "@/server";
-import { TestPapersOverview } from "@/app/(protected)/(pages)/test-papers/_components"
+import { TestPapersList } from "@/app/(protected)/(pages)/test-papers/_components"
 import { createClient } from "@/services/supabase/server"
 
 export default async function TestPapersPage() {
@@ -11,6 +11,6 @@ export default async function TestPapersPage() {
   const initialTestPapers = await caller.testPaper.getAll()
 
   return (
-    <TestPapersOverview initialTestPapers={initialTestPapers} />
+    <TestPapersList initialTestPapers={initialTestPapers} />
   )
 }

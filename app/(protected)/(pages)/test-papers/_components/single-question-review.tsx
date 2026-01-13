@@ -9,7 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ParsedQuestionType, TestPaperDetailsType } from "../types/questions"
+import { ParsedQuestionType, TestPaperDetailsType } from "../_types/questions"
 
 interface SingleQuestionReviewProps {
   question: ParsedQuestionType

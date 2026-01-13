@@ -3,6 +3,7 @@ export const ROUTES = {
   TEST_PAPERS: {
     ROOT: "/test-papers",
     CREATE: "/test-papers/create",
+    VIEW: (id: string) => `/test-papers/${id}`,
   },
   MOCK_TESTS: "/tests",
   FLASHCARDS: "/flashcards",
