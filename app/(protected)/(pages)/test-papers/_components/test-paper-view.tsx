@@ -6,18 +6,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Icons } from "@/components/icons"
-import { TestPaperDetailsType, ParsedQuestionType } from "../types/questions"
-import { SingleQuestionReview } from "./single-question-review"
+import { TestPaperGetAllType } from "@/lib/types"
 
-interface TestPaperDetailsProps {
-  testPaper: TestPaperDetailsType
+interface TestPaperViewProps {
+  testPaper: TestPaperGetAllType & { 
+    uploadFiles?: any;
+    parsed_questions?: any[];
+    upload_progress?: any;
+  }
 }
 
-export function TestPaperDetails({ testPaper }: TestPaperDetailsProps) {
+export const TestPaperView = ({ testPaper }: TestPaperViewProps) => {
   const router = useRouter()
-  const [selectedQuestion, setSelectedQuestion] = useState<ParsedQuestionType | null>(null)
 
   const statusColors: Record<string, string> = {
     queued: "bg-yellow-100 text-yellow-800",
@@ -33,29 +34,13 @@ export function TestPaperDetails({ testPaper }: TestPaperDetailsProps) {
     hard: "bg-red-100 text-red-800",
   }
 
-  const reviewStatusColors: Record<string, string> = {
-    pending: "bg-gray-100 text-gray-800",
-    approved: "bg-green-100 text-green-800",
-    rejected: "bg-red-100 text-red-800",
-    needs_changes: "bg-orange-100 text-orange-800",
-  }
-
-  const handleReviewQuestion = (question: ParsedQuestionType) => {
-    setSelectedQuestion(question)
-  }
-
-  const handleBackFromReview = () => {
-    setSelectedQuestion(null)
-  }
-
-  if (selectedQuestion) {
-    return (
-      <SingleQuestionReview
-        question={selectedQuestion}
-        testPaper={testPaper}
-        onBack={handleBackFromReview}
-      />
-    )
+  // Construct the full Supabase storage URL for PDF
+  const getPdfUrl = (uploadFile: any) => {
+    if (!uploadFile || !uploadFile.storageUrl) return null;
+    
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const bucketName = process.env.NEXT_PUBLIC_BUCKET_NAME || 'prepper-assets';
+    return `${supabaseUrl}/storage/v1/object/public/${bucketName}/${uploadFile.storageUrl}`;
   }
 
   return (
@@ -73,7 +58,7 @@ export function TestPaperDetails({ testPaper }: TestPaperDetailsProps) {
         </Button>
         <div className="flex-1">
           <h1 className="text-3xl font-bold">{testPaper.title}</h1>
-          <p className="text-muted-foreground">{testPaper.description}</p>
+          <p className="text-muted-foreground">{testPaper.description || 'No description available'}</p>
         </div>
         <Badge className={statusColors[testPaper.status]}>
           {testPaper.status}
@@ -96,11 +81,11 @@ export function TestPaperDetails({ testPaper }: TestPaperDetailsProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Subject</label>
-                  <p className="font-semibold">{testPaper.subject}</p>
+                  <p className="font-semibold capitalize">{testPaper.subject}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Duration</label>
-                  <p className="font-semibold">{testPaper.duration_minutes || 'N/A'} minutes</p>
+                  <p className="font-semibold">{testPaper.durationMinutes || 'N/A'} minutes</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Difficulty</label>
@@ -113,7 +98,7 @@ export function TestPaperDetails({ testPaper }: TestPaperDetailsProps) {
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Created</label>
                   <p className="font-semibold">
-                    {new Date(testPaper.created_at).toLocaleDateString()}
+                    {testPaper.createdAt ? new Date(testPaper.createdAt).toLocaleDateString() : 'N/A'}
                   </p>
                 </div>
               </div>
@@ -132,6 +117,61 @@ export function TestPaperDetails({ testPaper }: TestPaperDetailsProps) {
               )}
             </CardContent>
           </Card>
+
+          {/* PDF Preview */}
+          {testPaper.uploadFiles && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icons.fileText className="h-5 w-5" />
+                  PDF Document
+                </CardTitle>
+                <CardDescription>
+                  View and download the uploaded test paper PDF
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-4 p-4 border rounded-lg">
+                  <Icons.file className="h-8 w-8 text-blue-600" />
+                  <div className="flex-1">
+                    <p className="font-medium">{testPaper.uploadFiles.filename}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {testPaper.uploadFiles.mimeType} • {testPaper.uploadFiles.fileRole}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const pdfUrl = getPdfUrl(testPaper.uploadFiles);
+                        if (pdfUrl) window.open(pdfUrl, '_blank');
+                      }}
+                    >
+                      <Icons.eye className="mr-2 h-4 w-4" />
+                      View
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const pdfUrl = getPdfUrl(testPaper.uploadFiles);
+                        if (pdfUrl) {
+                          const link = document.createElement('a');
+                          link.href = pdfUrl;
+                          link.download = testPaper.uploadFiles.filename;
+                          link.click();
+                        }
+                      }}
+                    >
+                      <Icons.download className="mr-2 h-4 w-4" />
+                      Download
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Progress Information */}
           {testPaper.upload_progress && (
@@ -179,39 +219,31 @@ export function TestPaperDetails({ testPaper }: TestPaperDetailsProps) {
             </Card>
           )}
 
-          {/* Questions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Icons.helpCircle className="h-5 w-5" />
-                Questions ({testPaper.parsed_questions?.length || 0})
-              </CardTitle>
-              <CardDescription>
-                Review and manage parsed questions from this test paper
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {testPaper.parsed_questions && testPaper.parsed_questions.length > 0 ? (
+          {/* Questions Preview */}
+          {testPaper.parsed_questions && testPaper.parsed_questions.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icons.helpCircle className="h-5 w-5" />
+                  Questions ({testPaper.parsed_questions.length})
+                </CardTitle>
+                <CardDescription>
+                  Preview of parsed questions from this test paper
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-4">
-                  {testPaper.parsed_questions.map((question, index) => (
+                  {testPaper.parsed_questions.slice(0, 5).map((question, index) => (
                     <div
                       key={question.parsed_questions_id}
                       className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
                     >
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-4">
                         <div className="flex-1 space-y-2">
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-muted-foreground">
                               Q{index + 1}
                             </span>
-                            <Badge className={reviewStatusColors[question.review_status]}>
-                              {question.review_status}
-                            </Badge>
-                            {question.need_review && (
-                              <Badge variant="outline" className="text-orange-600">
-                                Needs Review
-                              </Badge>
-                            )}
                             {question.page_number && (
                               <span className="text-xs text-muted-foreground">
                                 Page {question.page_number}
@@ -221,38 +253,27 @@ export function TestPaperDetails({ testPaper }: TestPaperDetailsProps) {
                           <p className="text-sm line-clamp-2">{question.question_text}</p>
                           {question.options && (
                             <div className="text-xs text-muted-foreground">
-                              {question.options.options.length} options
+                              {question.options.options?.length || 0} options
                             </div>
                           )}
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleReviewQuestion(question)}
-                            className="bg-transparent"
-                          >
-                            <Icons.eye className="h-4 w-4" />
-                          </Button>
                         </div>
                       </div>
                     </div>
                   ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Icons.fileText className="mx-auto h-12 w-12 mb-4 opacity-50" />
-                  <p>No questions parsed yet</p>
-                  {testPaper.status === 'completed' && (
-                    <p className="text-sm">Try processing the test paper again</p>
+                  {testPaper.parsed_questions.length > 5 && (
+                    <div className="text-center">
+                      <Button variant="outline" size="sm">
+                        View All {testPaper.parsed_questions.length} Questions
+                      </Button>
+                    </div>
                   )}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
-        {/* Right Column - Actions & Files */}
+        {/* Right Column - Actions & Metadata */}
         <div className="space-y-6">
           {/* Quick Actions */}
           <Card>
@@ -272,10 +293,19 @@ export function TestPaperDetails({ testPaper }: TestPaperDetailsProps) {
                   Start Practice Test
                 </Button>
               )}
-              <Button variant="outline" className="w-full justify-start bg-transparent">
-                <Icons.download className="mr-2 h-4 w-4" />
-                Download PDF
-              </Button>
+              {testPaper.uploadFiles && (
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start bg-transparent"
+                  onClick={() => {
+                    const pdfUrl = getPdfUrl(testPaper.uploadFiles);
+                    if (pdfUrl) window.open(pdfUrl, '_blank');
+                  }}
+                >
+                  <Icons.eye className="mr-2 h-4 w-4" />
+                  View PDF
+                </Button>
+              )}
               <Button variant="outline" className="w-full justify-start bg-transparent">
                 <Icons.share className="mr-2 h-4 w-4" />
                 Share Test Paper
@@ -283,30 +313,24 @@ export function TestPaperDetails({ testPaper }: TestPaperDetailsProps) {
             </CardContent>
           </Card>
 
-          {/* Uploaded Files */}
+          {/* Metadata */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Uploaded Files</CardTitle>
+              <CardTitle className="text-base">Metadata</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {testPaper.upload_files && testPaper.upload_files.length > 0 ? (
-                testPaper.upload_files.map((file) => (
-                  <div key={file.upload_file_id} className="flex items-center gap-3 p-2 rounded border">
-                    <Icons.file className="h-4 w-4 text-muted-foreground" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{file.filename}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {file.pages_count || '?'} pages • {file.mime_type}
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      <Icons.externalLink className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-muted-foreground">No files uploaded</p>
-              )}
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Test Paper ID</label>
+                <p className="text-xs font-mono break-all">{testPaper.testPaperId}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Created Date</label>
+                <p className="text-sm">{testPaper.createdAt ? new Date(testPaper.createdAt).toLocaleString() : 'N/A'}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Last Updated</label>
+                <p className="text-sm">{testPaper.updatedAt ? new Date(testPaper.updatedAt).toLocaleString() : 'N/A'}</p>
+              </div>
             </CardContent>
           </Card>
         </div>

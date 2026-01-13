@@ -18,7 +18,7 @@ export class FileUploadService extends Supabase {
         }
     }
 
-    async uploadFile({ file, filename, bucket = "hrms-assets", folder }: { file: File, filename: string, bucket?: string, folder: string }) {
+    async uploadFile({ file, filename, bucket = "prepper-assets", folder }: { file: File, filename: string, bucket?: string, folder: string }) {
         await this.ensureAuthenticated()
 
         const uniqueName = generateUniqueFilename(filename);

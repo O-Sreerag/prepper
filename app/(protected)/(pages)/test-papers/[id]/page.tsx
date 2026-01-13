@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { TestPaperDetails } from "../_components/test-papers-details"
+import { TestPaperDetails } from "@/app/(protected)/(pages)/test-papers/_components"
 
 interface TestPaperDetailsPageProps {
   params: {

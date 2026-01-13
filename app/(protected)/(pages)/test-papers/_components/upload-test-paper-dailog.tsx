@@ -15,9 +15,10 @@ import { showErrorMessage } from "@/lib/utils";
 interface UploadPaperDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
-export function UploadPaperDialog({ open, onOpenChange }: UploadPaperDialogProps) {
+export function UploadPaperDialog({ open, onOpenChange, onSuccess }: UploadPaperDialogProps) {
   const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<UploadPaperInput>({
@@ -50,6 +51,7 @@ export function UploadPaperDialog({ open, onOpenChange }: UploadPaperDialogProps
       toastWithTimeout(ToastVariant.Success, "Upload successful!");
       onOpenChange(false);
       form.reset();
+      onSuccess?.();
     } catch (error) {
       showErrorMessage({ error, fallbackMessage: "An unknown error occurred" });
     } finally {

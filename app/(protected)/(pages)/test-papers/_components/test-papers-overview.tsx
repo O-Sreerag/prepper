@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { trpc } from '@/app/_trpc/client'
 import { UploadPaperDialog } from "./upload-test-paper-dailog"
 import { QuestionReview } from "./test-papers-review"
+import { TestPaperView } from "./test-paper-view"
 import { TEST_PAPERS_OVERVIEW_STRINGS as STRINGS } from "@/constants"
 import { TestPaperGetAllType } from "@/lib/types"
 
@@ -21,6 +22,7 @@ type Props = {
 export function TestPapersOverview({ initialTestPapers }: Props) {
   const [isUploadDialogOpen, setUploadDialogOpen] = useState(false)
   const [selectedJob, setSelectedJob] = useState<TestPaperGetAllType | null>(null)
+  const [selectedView, setSelectedView] = useState<TestPaperGetAllType | null>(null)
 
   const {
     data: testPapers = initialTestPapers,
@@ -33,6 +35,8 @@ export function TestPapersOverview({ initialTestPapers }: Props) {
   })
 
   const isLoading = isFetching && initialTestPapers.length === 0
+
+  console.log("Test papers:", initialTestPapers)
 
   const handleProcessTestPaper = async (testPaperId: string) => {
     console.log("Processing test paper:", testPaperId)
@@ -56,6 +60,10 @@ export function TestPapersOverview({ initialTestPapers }: Props) {
 
   if (selectedJob) {
     return <QuestionReview testPaper={selectedJob} onBack={() => setSelectedJob(null)} />
+  }
+
+  if (selectedView) {
+    return <TestPaperView testPaper={selectedView} />
   }
 
   const testPaperColumns: ColumnDef<any>[] = [
@@ -101,10 +109,44 @@ export function TestPapersOverview({ initialTestPapers }: Props) {
       },
     },
     {
-      accessorKey: "created_at",
+      accessorKey: "createdAt",
       header: "Uploaded",
       cell: ({ row }) =>
-        new Date(row.original.created_at).toLocaleDateString(),
+        new Date(row.original.createdAt).toLocaleDateString(),
+    },
+    {
+      accessorKey: "uploadFiles",
+      header: "PDF Preview",
+      cell: ({ row }) => {
+        const uploadFile = row.original.uploadFiles;
+        
+        if (!uploadFile || !uploadFile.storageUrl) {
+          return <span className="text-muted-foreground text-sm">No PDF</span>;
+        }
+
+        const isPdf = uploadFile.mimeType === 'application/pdf';
+        
+        if (!isPdf) {
+          return <span className="text-muted-foreground text-sm">{uploadFile.filename || 'File'}</span>;
+        }
+
+        // Construct the full Supabase storage URL
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const bucketName = process.env.NEXT_PUBLIC_BUCKET_NAME || 'prepper-assets';
+        const fullUrl = `${supabaseUrl}/storage/v1/object/public/${bucketName}/${uploadFile.storageUrl}`;
+
+        return (
+          <a
+            href={fullUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline text-sm"
+          >
+            <Icons.fileText className="h-4 w-4" />
+            {uploadFile.filename || 'View PDF'}
+          </a>
+        );
+      },
     },
     {
       id: "actions",
@@ -114,11 +156,20 @@ export function TestPapersOverview({ initialTestPapers }: Props) {
 
         return (
           <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setSelectedView(paper)}
+            >
+              <Icons.eye className="mr-2 h-4 w-4" />
+              View
+            </Button>
+            
             {["queued", "failed"].includes(paper.status) && (
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => handleProcessTestPaper(paper.test_paper_id)}
+                onClick={() => handleProcessTestPaper(paper.testPaperId)}
                 disabled={paper.status === "processing"}
               >
                 {paper.status === "failed" ? "Retry" : "Process"}
@@ -141,9 +192,13 @@ export function TestPapersOverview({ initialTestPapers }: Props) {
 
   return (
     <>
-      <UploadPaperDialog open={isUploadDialogOpen} onOpenChange={setUploadDialogOpen} />
+      <UploadPaperDialog 
+        open={isUploadDialogOpen} 
+        onOpenChange={setUploadDialogOpen} 
+        onSuccess={refetch}
+      />
 
-      <div className="container mx-auto py-8">
+      <div className="container">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">{STRINGS.title}</h1>
