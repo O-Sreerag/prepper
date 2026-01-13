@@ -38,10 +38,18 @@ export function TestPapersOverview({ initialTestPapers }: Props) {
     console.log("Processing test paper:", testPaperId)
     try {
       const response = await fetch(`/api/test-paper/process-upload-files/${testPaperId}`, { method: "POST" })
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error("API error response:", errorText)
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
       const result = await response.json()
       if (!result.success) throw new Error(result.error || "Failed to process test paper.")
       await refetch()
     } catch (err) {
+      console.error("Processing error:", err)
       alert(err instanceof Error ? err.message : "Unknown error during processing.")
     }
   }
