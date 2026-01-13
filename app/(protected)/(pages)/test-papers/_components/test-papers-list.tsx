@@ -37,8 +37,6 @@ export function TestPapersList({ initialTestPapers }: Props) {
 
   const isLoading = isFetching && initialTestPapers.length === 0
 
-  console.log("Test papers:", initialTestPapers)
-
   const handleProcessTestPaper = async (testPaperId: string) => {
     console.log("Processing test paper:", testPaperId)
     try {

@@ -1,12 +1,12 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Icons } from "@/components/icons"
 import { TestPaperGetAllType } from "@/lib/types"
+import { difficultyColors } from "@/app/(protected)/(pages)/test-papers/_constants"
 
 interface TestPaperOverViewProps {
   testPaper: TestPaperGetAllType & { 
@@ -17,22 +17,6 @@ interface TestPaperOverViewProps {
 }
 
 export const TestPaperOverView = ({ testPaper }: TestPaperOverViewProps) => {
-  const router = useRouter()
-
-  const statusColors: Record<string, string> = {
-    queued: "bg-yellow-100 text-yellow-800",
-    processing: "bg-blue-100 text-blue-800",
-    review: "bg-purple-100 text-purple-800",
-    failed: "bg-red-100 text-red-800",
-    completed: "bg-green-100 text-green-800",
-  }
-
-  const difficultyColors: Record<string, string> = {
-    easy: "bg-green-100 text-green-800",
-    medium: "bg-yellow-100 text-yellow-800",
-    hard: "bg-red-100 text-red-800",
-  }
-
   // Construct the full Supabase storage URL for PDF
   const getPdfUrl = (uploadFile: any) => {
     if (!uploadFile || !uploadFile.storageUrl) return null;
@@ -44,17 +28,6 @@ export const TestPaperOverView = ({ testPaper }: TestPaperOverViewProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold">{testPaper.title}</h1>
-          <p className="text-muted-foreground">{testPaper.description || 'No description available'}</p>
-        </div>
-        <Badge className={statusColors[testPaper.status]}>
-          {testPaper.status}
-        </Badge>
-      </div>
-
       {/* Main Content */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left Column - Main Info */}

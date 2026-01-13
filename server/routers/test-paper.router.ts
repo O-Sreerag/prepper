@@ -3,7 +3,7 @@ import { z } from "zod"
 
 import { router, protectedProcedure } from "@/server/trpc"
 import { db } from "@/db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, sql, ilike } from "drizzle-orm";
 import { testPapers, uploadFiles, parsedQuestions } from "@/db/schema";
 
 export const testPaperRouter = router({
@@ -112,6 +112,98 @@ export const testPaperRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to fetch test paper",
+        });
+      }
+    }),
+
+  getQuestions: protectedProcedure
+    .input(z.object({ 
+      testPaperId: z.string(),
+      page: z.number().min(1).default(1),
+      limit: z.number().min(1).max(50).default(5),
+      search: z.string().optional(),
+      statusFilter: z.string().optional(),
+      reviewFilter: z.string().optional(),
+    }))
+    .query(async ({ ctx, input }) => {
+      try {
+        // Build conditions array
+        const conditions = [
+          eq(parsedQuestions.testPaperId, input.testPaperId),
+          eq(testPapers.userId, ctx.user.id)
+        ];
+        
+        if (input.statusFilter && input.statusFilter !== 'all') {
+          conditions.push(eq(parsedQuestions.reviewStatus, input.statusFilter));
+        }
+        
+        if (input.reviewFilter && input.reviewFilter !== 'all') {
+          if (input.reviewFilter === 'needs_review') {
+            conditions.push(eq(parsedQuestions.needReview, true));
+          } else if (input.reviewFilter === 'no_review_needed') {
+            conditions.push(eq(parsedQuestions.needReview, false));
+          }
+        }
+
+        // Add search to conditions if provided
+        if (input.search) {
+          conditions.push(
+            sql`(${parsedQuestions.questionText} ILIKE ${'%' + input.search + '%'} OR 
+                  ${parsedQuestions.options}::text ILIKE ${'%' + input.search + '%'})`
+          );
+        }
+
+        // Build the base query
+        const query = db
+          .select({
+            parsedQuestionsId: parsedQuestions.parsedQuestionsId,
+            questionText: parsedQuestions.questionText,
+            options: parsedQuestions.options,
+            detectedAnswer: parsedQuestions.detectedAnswer,
+            detectedAnswerConfidence: parsedQuestions.detectedAnswerConfidence,
+            pageNumber: parsedQuestions.pageNumber,
+            sequenceInDoc: parsedQuestions.sequenceInDoc,
+            reviewStatus: parsedQuestions.reviewStatus,
+            needReview: parsedQuestions.needReview,
+            parseConfidence: parsedQuestions.parseConfidence,
+            createdAt: parsedQuestions.createdAt,
+          })
+          .from(parsedQuestions)
+          .innerJoin(testPapers, eq(parsedQuestions.testPaperId, testPapers.testPaperId))
+          .where(and(...conditions))
+          .orderBy(parsedQuestions.sequenceInDoc)
+          .limit(input.limit)
+          .offset((input.page - 1) * input.limit);
+
+        // Get total count for pagination
+        const countQuery = db
+          .select({ count: sql<number>`count(*)` })
+          .from(parsedQuestions)
+          .innerJoin(testPapers, eq(parsedQuestions.testPaperId, testPapers.testPaperId))
+          .where(and(...conditions));
+
+        const [questions, totalCountResult] = await Promise.all([query, countQuery]);
+
+        const totalCount = totalCountResult[0]?.count || 0;
+        const totalPages = Math.ceil(totalCount / input.limit);
+
+        return {
+          questions,
+          pagination: {
+            currentPage: input.page,
+            totalPages,
+            totalCount,
+            limit: input.limit,
+            hasNextPage: input.page < totalPages,
+            hasPreviousPage: input.page > 1,
+          }
+        };
+      } catch (err) {
+        console.error("testPaper.getQuestions error", err);
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch questions",
         });
       }
     }),

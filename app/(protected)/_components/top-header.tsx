@@ -7,8 +7,6 @@ import { cn } from "@/lib/utils"
 
 export const TopHeader = () => {
   const { breadcrumbs, backButton } = useHeader()
-  console.log("backbutton", backButton)
-  console.log("breadcrumbs", breadcrumbs)
 
   // If nothing to show → render nothing (important)
   if (!backButton?.show && breadcrumbs.length === 0) {

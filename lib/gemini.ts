@@ -4,10 +4,65 @@ import { fileToGenerativePart } from "./utils"
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY as string)
 
 /**
+ * Get available models to debug model naming issues
+ */
+async function getAvailableModels() {
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${process.env.GOOGLE_GENERATIVE_AI_API_KEY}`)
+    const data = await response.json()
+    console.log("Available models:", data.models?.map((m: any) => m.name))
+    return data.models || []
+  } catch (error) {
+    console.error("Failed to fetch models:", error)
+    return []
+  }
+}
+
+/**
  * Process a question paper buffer with Gemini AI and return parsed questions
  */
 export async function processQuestionPaperWithGemini(buffer: Buffer, mimeType: string) {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }) // Ensure valid model
+    // Try to get available models for debugging
+    const availableModels = await getAvailableModels()
+    
+    // Use correct model names without the "models/" prefix
+    // The SDK adds the prefix automatically
+    // Using models from the available list
+    const modelNames = [
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-2.5-pro",
+      "gemini-2.0-flash-001",
+      "gemini-2.0-flash-lite"
+    ]
+    
+    let model
+    let lastError
+    
+    for (const modelName of modelNames) {
+      try {
+        console.log(`Trying model: ${modelName}`)
+        model = genAI.getGenerativeModel({ model: modelName })
+        
+        // Don't test with image first, just initialize
+        console.log(`Successfully initialized model: ${modelName}`)
+        break
+      } catch (error: any) {
+        console.log(`Model ${modelName} failed:`, error?.message || error)
+        lastError = error
+        model = undefined
+        continue
+      }
+    }
+    
+    if (!model) {
+      const availableModelsList = availableModels.map((m: any) => m.name).join(', ')
+      throw new Error(
+        `All models failed. Available models: ${availableModelsList || 'none found'}. ` +
+        `Last error: ${lastError?.message || lastError}`
+      )
+    }
+
     const prompt = `
 You are an AI assistant that extracts multiple-choice questions from a document.
 

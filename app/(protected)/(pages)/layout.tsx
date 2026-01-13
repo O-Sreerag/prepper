@@ -11,8 +11,6 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   return (
     <div className="flex min-h-screen bg-background">
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary opacity-70" />
-
       <DesktopSidebar />
 
       <div
@@ -22,8 +20,10 @@ export default function Layout({ children }: LayoutProps) {
         <DesktopNavbar />
 
         <HeaderProvider>
-          <TopHeader />
-          <main className="flex-1 p-3 sm:p-4 lg:p-6 pb-safe">
+          <div className="w-[calc(100%-var(--sidebar-width))] fixed top-16 z-10" >
+            <TopHeader />
+          </div>
+          <main className="flex-1 p-3 sm:p-4 lg:p-6 lg:pt-12 pb-safe">
             {children}
           </main>
         </HeaderProvider>
